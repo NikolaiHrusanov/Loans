@@ -1,0 +1,2880 @@
+<!DOCTYPE html>
+<html lang="en" class="dark-theme">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register | NexusBank</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/auth.css" />
+  
+  <style>
+    /* ===== WIZARD MODE STYLES ===== */
+    
+    /* Register Button - Centered at top */
+    .wizard-register-btn {
+      position: fixed;
+      top: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(108, 92, 231, 0.3);
+      transition: all 0.3s var(--ease);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.3px;
+    }
+    
+    .wizard-register-btn i {
+      font-size: 1rem;
+    }
+    
+    .wizard-register-btn:hover {
+      transform: translateX(-50%) translateY(-3px);
+      box-shadow: 0 15px 40px rgba(108, 92, 231, 0.5);
+    }
+
+    .register-page-signin-link {
+      position: fixed;
+      top: 40px;
+      right: 32px;
+      z-index: 100;
+      font-size: 0.95rem;
+      color: var(--text-2);
+    }
+
+    .register-page-signin-link a {
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .register-page-signin-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 900px) {
+      .register-page-signin-link {
+        right: 16px;
+        top: 88px;
+        font-size: 0.85rem;
+      }
+    }
+    
+    /* Wizard Overlay - Full screen modal */
+    .wizard-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(13, 15, 26, 0.98);
+      backdrop-filter: blur(15px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.4s var(--ease);
+    }
+    
+    .wizard-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+    
+    /* Wizard Container */
+    .wizard-container {
+      width: 90%;
+      max-width: 520px;
+      max-height: 85vh;
+      overflow-y: auto;
+      background: linear-gradient(135deg, rgba(26, 30, 53, 0.98) 0%, rgba(19, 22, 42, 0.98) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 40px;
+      box-shadow: var(--sh-xl);
+      backdrop-filter: blur(20px);
+      position: relative;
+      animation: wizardSlideIn 0.4s var(--ease-out);
+    }
+    
+    .wizard-container::-webkit-scrollbar {
+      width: 4px;
+    }
+    
+    .wizard-container::-webkit-scrollbar-thumb {
+      background: rgba(108, 92, 231, 0.35);
+      border-radius: 2px;
+    }
+    
+    @keyframes wizardSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    /* Close button */
+    .wizard-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: var(--text-3);
+      font-size: 1.2rem;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .wizard-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-1);
+    }
+    
+    /* Wizard Steps */
+    .wizard-step {
+      display: none;
+      animation: fadeStep 0.4s var(--ease);
+    }
+    
+    .wizard-step.active {
+      display: block;
+    }
+    
+    @keyframes fadeStep {
+      from { opacity: 0; transform: translateX(10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    /* Wizard Header */
+    .wizard-header {
+      margin-bottom: 32px;
+      text-align: center;
+    }
+    
+    .wizard-title {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 8px;
+    }
+    
+    .wizard-subtitle {
+      color: var(--text-2);
+      font-size: 0.9rem;
+    }
+    
+    /* Progress Steps */
+    .wizard-progress {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      position: relative;
+      padding: 0 10px;
+    }
+    
+    .wizard-progress::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 25px;
+      right: 25px;
+      height: 2px;
+      background: var(--border);
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+    
+    .progress-step {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-3);
+      font-weight: 600;
+      font-size: 0.8rem;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s var(--ease);
+    }
+    
+    .progress-step.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: 0 0 20px rgba(108, 92, 231, 0.5);
+    }
+    
+    .progress-step.completed {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+    
+    .progress-step.completed span {
+      display: none;
+    }
+    
+    .progress-step.completed::after {
+      content: '✓';
+      font-size: 0.9rem;
+    }
+    
+    /* Country Grid */
+    .country-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+    
+    .country-option {
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text-1);
+      cursor: pointer;
+      transition: all 0.25s var(--ease);
+      text-align: left;
+      font-size: 0.95rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .country-option i {
+      color: var(--text-3);
+      font-size: 0.9rem;
+      width: 20px;
+    }
+    
+    .country-option:hover {
+      background: rgba(108, 92, 231, 0.15);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    
+    .country-option.selected {
+      background: rgba(108, 92, 231, 0.25);
+      border-color: var(--primary);
+    }
+    
+    .country-option.selected i {
+      color: var(--primary);
+    }
+    
+    /* Verification Code Input */
+    .verification-code-wrapper {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 24px 0;
+    }
+    
+    .code-input {
+      width: 50px;
+      height: 60px;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 600;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text-1);
+      outline: none;
+      transition: all 0.2s;
+    }
+    
+    .code-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+    }
+    
+    /* Phone Input with Country Code */
+    .phone-input-wrapper {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .country-code {
+      padding: 11px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text-1);
+      font-weight: 600;
+      min-width: 90px;
+      text-align: center;
+    }
+    
+    /* Navigation Buttons */
+    .wizard-nav {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+    
+    .wizard-btn {
+      flex: 1;
+      padding: 13px 20px;
+      border-radius: var(--r-sm);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .wizard-btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 4px 20px rgba(108, 92, 231, 0.35);
+    }
+    
+    .wizard-btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(108, 92, 231, 0.5);
+    }
+    
+    .wizard-btn-primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    
+    .wizard-btn-secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+    }
+    
+    .wizard-btn-secondary:hover {
+      background: var(--surface-hover);
+      color: var(--text-1);
+    }
+    
+    /* Social Buttons in Wizard */
+    .wizard-social {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    
+    .wizard-social-btn {
+      flex: 1;
+      padding: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text-1);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .wizard-social-btn:hover {
+      background: var(--surface-hover);
+      border-color: rgba(108, 92, 231, 0.4);
+    }
+    
+    /* Upload Area in Wizard */
+    .wizard-upload {
+      margin-top: 20px;
+    }
+    
+    /* Step Indicator Text */
+    .step-indicator {
+      text-align: center;
+      color: var(--text-3);
+      font-size: 0.8rem;
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+    }
+
+
+        /* Custom Select Styling */
+    .form-control select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background: transparent;
+      padding-right: 40px;
+    }
+    
+    /* Style for the dropdown arrow */
+    .input-with-icon {
+      position: relative;
+    }
+    
+    .input-with-icon .fa-chevron-down {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      pointer-events: none;
+      font-size: 0.8rem;
+      transition: transform 0.3s ease;
+    }
+    
+    /* Style select options */
+    .form-control option {
+      background: var(--surface);
+      color: var(--text-1);
+      padding: 12px;
+    }
+        /* Custom Select Dropdown Styling */
+    select.form-control {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background: transparent;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+    
+    /* Style the dropdown options */
+    select.form-control option {
+      background: var(--surface, #1a1e35);
+      color: var(--text-1, #ffffff);
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    
+    select.form-control option:hover,
+    select.form-control option:focus,
+    select.form-control option:active,
+    select.form-control option:checked {
+      background: linear-gradient(135deg, rgba(108, 92, 231, 0.2), rgba(0, 206, 201, 0.2));
+      color: var(--text-1, #ffffff);
+    }
+    
+    /* Custom scrollbar for select dropdown */
+    select.form-control::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    select.form-control::-webkit-scrollbar-track {
+      background: var(--surface, #1a1e35);
+      border-radius: 3px;
+    }
+    
+    select.form-control::-webkit-scrollbar-thumb {
+      background: var(--primary, #6c5ce7);
+      border-radius: 3px;
+    }
+    
+    /* Animation for the chevron icon */
+    .input-with-icon .fa-chevron-down {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      pointer-events: none;
+      font-size: 0.8rem;
+      transition: transform 0.3s ease;
+    }
+    
+    /* Rotate chevron when select is focused */
+    .input-with-icon:focus-within .fa-chevron-down {
+      transform: translateY(-50%) rotate(180deg);
+      color: var(--primary, #6c5ce7);
+    }
+    
+    /* Hover effect for the select */
+    select.form-control:hover {
+      border-color: var(--primary, #6c5ce7);
+    }
+    
+    /* Focus effect */
+    select.form-control:focus {
+      border-color: var(--primary, #6c5ce7);
+      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+      outline: none;
+    }
+    
+    /* Style for the selected option */
+    select.form-control option:checked {
+      font-weight: 600;
+      background: linear-gradient(135deg, rgba(108, 92, 231, 0.15), rgba(0, 206, 201, 0.15));
+    }
+
+    .auth-brand {
+  display: inline-flex; /* Only takes up space needed for content */
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  width: fit-content; /* Ensures it doesn't stretch */
+  max-width: max-content; /* Prevents expansion */
+  pointer-events: auto; /* Keeps it clickable */
+}
+    /* Toast notification animation */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+  </style>
+</head>
+<body class="auth-page">
+
+  <!-- Page Transition Overlay -->
+  <div class="page-transition" id="pageTransition">
+    <div class="transition-loader">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">NexusBank</div>
+    </div>
+  </div>
+
+  <!-- Animated background -->
+  <div class="auth-background"></div>
+  <div class="bg-grain"></div>
+
+  <!-- ══════════════════════════════════════════
+       REGISTER BUTTON - Centered at top
+  ══════════════════════════════════════════ -->
+  <button class="wizard-register-btn" id="wizardRegisterBtn">
+    <i class="fas fa-user-plus"></i>
+    Register
+  </button>
+
+  <p class="register-page-signin-link">
+    Already have an account? <a href="sign-in.html">Sign in</a>
+  </p>
+
+  <!-- ══════════════════════════════════════════
+       WIZARD OVERLAY - Step-by-step registration
+  ══════════════════════════════════════════ -->
+  <div class="wizard-overlay" id="wizardOverlay">
+    <div class="wizard-container">
+      <button class="wizard-close" id="wizardClose">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <!-- Progress Steps -->
+      <div class="wizard-progress" id="wizardProgress">
+        <div class="progress-step" data-step="1"><span>1</span></div>
+        <div class="progress-step" data-step="2"><span>2</span></div>
+        <div class="progress-step" data-step="3"><span>3</span></div>
+        <div class="progress-step" data-step="4"><span>4</span></div>
+        <div class="progress-step" data-step="5"><span>5</span></div>
+        <div class="progress-step" data-step="6"><span>6</span></div>
+        <div class="progress-step" data-step="7"><span>7</span></div>
+        <div class="progress-step" data-step="8"><span>8</span></div>
+      </div>
+
+      <!-- Step 1: Country Selection -->
+      <div class="wizard-step active" data-step="1">
+        <div class="wizard-header">
+          <div class="step-indicator">Step 1 of 8</div>
+          <h2 class="wizard-title">Select Your Country</h2>
+          <p class="wizard-subtitle">Choose your country of residence</p>
+        </div>
+        
+        <div class="country-grid" id="countryGrid"></div>
+        
+        <div class="wizard-nav">
+          <button class="wizard-btn wizard-btn-primary" id="nextStep1" disabled>
+            Continue <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+     <!-- Step 2: Email Verification -->
+<div class="wizard-step" data-step="2">
+  <div class="wizard-header">
+    <div class="step-indicator">Step 2 of 8</div>
+    <h2 class="wizard-title">Verify Your Email</h2>
+    <p class="wizard-subtitle" id="emailVerifySubtitle">Enter your email — verification is optional unless you receive the NexusBank 8-digit code</p>
+  </div>
+  
+  <div class="form-group">
+    <label class="form-label">Email Address</label>
+    <div class="input-with-icon">
+      <i class="fi fas fa-envelope"></i>
+     <input type="email" class="form-control" id="wizardEmail" placeholder="you@example.com" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+  
+  <div class="wizard-social">
+    <button type="button" class="wizard-social-btn" id="googleSignup">
+      <i class="fab fa-google"></i> Google
+    </button>
+  </div>
+  
+  <div id="emailVerificationSection" style="display:none;">
+    <p id="emailCodeSentMessage" style="color: var(--success); margin: 16px 0; text-align: center;">
+      <i class="fas fa-check-circle"></i> <span id="emailSentMessageText">Verification code sent to</span> <span id="sentEmailDisplay"></span>
+    </p>
+    <div class="verification-code-wrapper" id="emailCodeInputs">
+  <input type="text" class="code-input email-code" maxlength="1" data-index="0" inputmode="numeric" pattern="[0-9]*">
+  <input type="text" class="code-input email-code" maxlength="1" data-index="1" inputmode="numeric" pattern="[0-9]*">
+  <input type="text" class="code-input email-code" maxlength="1" data-index="2" inputmode="numeric" pattern="[0-9]*">
+  <input type="text" class="code-input email-code" maxlength="1" data-index="3" inputmode="numeric" pattern="[0-9]*">
+  <input type="text" class="code-input email-code" maxlength="1" data-index="4" inputmode="numeric" pattern="[0-9]*">
+  <input type="text" class="code-input email-code" maxlength="1" data-index="5" inputmode="numeric" pattern="[0-9]*">
+  <input type="text" class="code-input email-code" maxlength="1" data-index="6" inputmode="numeric" pattern="[0-9]*">
+  <input type="text" class="code-input email-code" maxlength="1" data-index="7" inputmode="numeric" pattern="[0-9]*">
+</div>
+    <div id="magicLinkHelp" style="display:none; margin: 16px 0; padding: 14px; background: rgba(108, 92, 231, 0.12); border: 1px solid rgba(108, 92, 231, 0.35); border-radius: var(--r-sm); color: var(--text-2); font-size: 0.9rem; line-height: 1.5;">
+      <strong style="color: var(--text-1);">Supabase email (for addresses other than your Resend account)</strong><br>
+      Enter the <strong>6-digit</strong> code from that email <em>or</em> click the confirmation link in the <strong>same browser</strong> where this page is open (Live Server <code>http://127.0.0.1:...</code>, not <code>file://</code>). Add that exact URL under Supabase → Authentication → URL Configuration → Redirect URLs.
+    </div>
+    <button type="button" class="wizard-btn wizard-btn-secondary" id="resendCode" style="margin-top: 12px;">
+      <i class="fas fa-redo-alt"></i> Resend Code
+    </button>
+  </div>
+  
+  <div class="wizard-nav wizard-nav-step2">
+    <button class="wizard-btn wizard-btn-secondary" data-prev>
+      <i class="fas fa-arrow-left"></i> Back
+    </button>
+    <button class="wizard-btn wizard-btn-secondary" id="skipEmailVerification" type="button" style="display:none;">
+      Continue without verifying <i class="fas fa-arrow-right"></i>
+    </button>
+    <button class="wizard-btn wizard-btn-primary" id="sendVerificationCode">
+      Send Code <i class="fas fa-paper-plane"></i>
+    </button>
+    <button class="wizard-btn wizard-btn-primary" id="verifyEmailCode" style="display:none;" disabled>
+      Verify <i class="fas fa-check"></i>
+    </button>
+  </div>
+</div>
+
+      <!-- Step 3: Phone Verification -->
+      <div class="wizard-step" data-step="3">
+        <div class="wizard-header">
+          <div class="step-indicator">Step 3 of 8</div>
+          <h2 class="wizard-title">Verify Your Phone</h2>
+          <p class="wizard-subtitle">We'll send an SMS verification code</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <div class="phone-input-wrapper">
+            <div class="country-code" id="selectedCountryCode">+1</div>
+            <div class="input-with-icon" style="flex:1;">
+              <i class="fi fas fa-phone"></i>
+              <input type="tel" class="form-control" id="wizardPhone" placeholder="123 456 7890">
+            </div>
+          </div>
+        </div>
+        
+        <div id="phoneVerificationSection" style="display:none;">
+          <p style="color: var(--success); margin: 16px 0; text-align: center;">
+            <i class="fas fa-check-circle"></i> SMS sent to <span id="sentPhoneDisplay"></span>
+          </p>
+          <div class="verification-code-wrapper">
+            <input type="text" class="code-input phone-code" maxlength="1" data-code="1">
+            <input type="text" class="code-input phone-code" maxlength="1" data-code="2">
+            <input type="text" class="code-input phone-code" maxlength="1" data-code="3">
+            <input type="text" class="code-input phone-code" maxlength="1" data-code="4">
+            <input type="text" class="code-input phone-code" maxlength="1" data-code="5">
+            <input type="text" class="code-input phone-code" maxlength="1" data-code="6">
+          </div>
+          <button type="button" class="wizard-btn wizard-btn-secondary" id="resendSmsCode" style="margin-top: 12px;">
+            <i class="fas fa-redo-alt"></i> Resend SMS
+          </button>
+        </div>
+        
+        <div class="wizard-nav">
+          <button class="wizard-btn wizard-btn-secondary" data-prev>
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button class="wizard-btn wizard-btn-primary" id="sendPhoneCode">
+            Send SMS <i class="fas fa-paper-plane"></i>
+          </button>
+          <button class="wizard-btn wizard-btn-primary" id="verifyPhoneCode" style="display:none;">
+            Verify <i class="fas fa-check"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 4: Full Name -->
+      <div class="wizard-step" data-step="4">
+        <div class="wizard-header">
+          <div class="step-indicator">Step 4 of 8</div>
+          <h2 class="wizard-title">What's Your Name?</h2>
+          <p class="wizard-subtitle">Enter your full legal name</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <div class="input-with-icon">
+            <i class="fi fas fa-user"></i>
+            <input type="text" class="form-control" id="wizardFullName" placeholder="John Doe">
+          </div>
+        </div>
+        
+        <div class="wizard-nav">
+          <button class="wizard-btn wizard-btn-secondary" data-prev>
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button class="wizard-btn wizard-btn-primary" id="nextFromName" disabled>
+            Continue <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 5: Address -->
+      <div class="wizard-step" data-step="5">
+        <div class="wizard-header">
+          <div class="step-indicator">Step 5 of 8</div>
+          <h2 class="wizard-title">Your Address</h2>
+          <p class="wizard-subtitle">Where do you live?</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Street Address</label>
+          <div class="input-with-icon">
+            <i class="fi fas fa-map-marker-alt"></i>
+            <input type="text" class="form-control" id="wizardAddress" placeholder="123 Main Street">
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" class="form-control" id="wizardCity" placeholder="City">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Postal Code</label>
+            <input type="text" class="form-control" id="wizardPostal" placeholder="Postal Code">
+          </div>
+        </div>
+        
+        <div class="wizard-nav">
+          <button class="wizard-btn wizard-btn-secondary" data-prev>
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button class="wizard-btn wizard-btn-primary" id="nextFromAddress" disabled>
+            Continue <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+                <!-- Step 6: Age & Occupation -->
+      <div class="wizard-step" data-step="6">
+        <div class="wizard-header">
+          <div class="step-indicator">Step 6 of 8</div>
+          <h2 class="wizard-title">Personal Details</h2>
+          <p class="wizard-subtitle">Tell us about yourself</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Age</label>
+          <div class="input-with-icon">
+            <i class="fi fas fa-calendar"></i>
+            <input type="text" class="form-control" id="wizardAge" placeholder="Enter your age (18-100)" inputmode="numeric" pattern="[0-9]*" maxlength="3">
+          </div>
+          <div class="form-hint" id="ageHint" style="color: var(--text-3); font-size: 0.8rem; margin-top: 4px;">
+            Must be between 18 and 100 years old
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Occupation</label>
+          <div class="input-with-icon">
+            <i class="fi fas fa-briefcase"></i>
+            <input type="text" class="form-control" id="wizardOccupation" placeholder="e.g. Software Engineer">
+          </div>
+        </div>
+        
+        <div class="wizard-nav">
+          <button class="wizard-btn wizard-btn-secondary" data-prev>
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button class="wizard-btn wizard-btn-primary" id="nextFromDetails" disabled>
+            Continue <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 7: ID Verification -->
+      <div class="wizard-step" data-step="7">
+        <div class="wizard-header">
+          <div class="step-indicator">Step 7 of 8</div>
+          <h2 class="wizard-title">ID Verification</h2>
+          <p class="wizard-subtitle">Upload a government-issued ID</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">ID Type</label>
+          <div class="input-with-icon" style="position: relative;">
+            <i class="fi fas fa-id-card"></i>
+            <select class="form-control" id="wizardIdType" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; padding-right: 40px;">
+              <option value="" disabled selected>Select ID type</option>
+              <option value="passport">🛂 Passport</option>
+              <option value="driver">🚗 Driver's License</option>
+              <option value="national">🆔 National ID Card</option>
+              <option value="residence">🏠 Residence Permit</option>
+              <option value="military">🎖️ Military ID</option>
+              <option value="other">📄 Other Government ID</option>
+            </select>
+            <i class="fas fa-chevron-down" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; font-size: 0.8rem; transition: transform 0.3s ease;"></i>
+          </div>
+        </div>
+        
+        <div class="form-group wizard-upload">
+          <label class="form-label">Upload Document</label>
+          <div class="file-upload" id="wizardFileUpload">
+            <input type="file" id="wizardIdDocument" accept=".jpg,.jpeg,.png,.pdf">
+            <div class="file-upload-label">
+              <i class="fas fa-cloud-arrow-up"></i>
+              <span>Click to upload or drag & drop</span>
+            </div>
+          </div>
+          <div class="file-preview" id="wizardFilePreview" style="display:none;">
+            <i class="fas fa-file"></i>
+            <span id="wizardFileName"></span>
+            <button type="button" class="btn-remove" id="wizardRemoveFile">
+              <i class="fas fa-xmark"></i>
+            </button>
+          </div>
+          <div class="form-hint" style="color: var(--text-3); font-size: 0.8rem; margin-top: 8px;">
+            <i class="fas fa-info-circle"></i> Accepted formats: JPG, PNG, PDF (max 10MB)
+          </div>
+        </div>
+        
+        <div class="wizard-nav">
+          <button class="wizard-btn wizard-btn-secondary" data-prev>
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button class="wizard-btn wizard-btn-primary" id="nextFromId" disabled>
+            Continue <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+      <!-- Step 8: Password Setup -->
+      <div class="wizard-step" data-step="8">
+        <div class="wizard-header">
+          <div class="step-indicator">Step 8 of 8</div>
+          <h2 class="wizard-title">Create Password</h2>
+          <p class="wizard-subtitle">Choose a strong password</p>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-with-icon">
+            <i class="fi fas fa-lock"></i>
+            <input type="password" class="form-control has-action" id="wizardPassword" placeholder="••••••••">
+            <button type="button" class="input-action toggle-pw" data-target="wizardPassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div class="strength-bar-wrap">
+            <div class="strength-bar" id="wizardStrengthBar"></div>
+          </div>
+          <div class="strength-label" id="wizardStrengthLabel">Enter a password</div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <div class="input-with-icon">
+            <i class="fi fas fa-lock"></i>
+            <input type="password" class="form-control has-action" id="wizardConfirmPassword" placeholder="••••••••">
+            <button type="button" class="input-action toggle-pw" data-target="wizardConfirmPassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div class="form-hint error" id="wizardPwMismatch" style="display:none;">
+            <i class="fas fa-circle-exclamation"></i> Passwords do not match.
+          </div>
+        </div>
+        
+        <div class="wizard-nav">
+          <button class="wizard-btn wizard-btn-secondary" data-prev>
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button class="wizard-btn wizard-btn-primary" id="completeRegistration" disabled>
+            Complete Registration <i class="fas fa-check"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MAIN LAYOUT (Left panel only visible initially)
+  ══════════════════════════════════════════ -->
+  <div class="auth-container" id="authContainer">
+    <!-- LEFT PANEL - Visible by default -->
+    <div class="auth-left" id="authLeft">
+      <a href="index.html" class="auth-brand">
+        <img src="https://i.ibb.co/xq8hRvSM/Nexus-Bank-removebg-preview.png" alt="Nexus Bank Logo" width="60px" height="50px">
+        <span class="brand-name">Nexus<span class="brand-accent">Bank</span></span>
+      </a>
+
+      <div class="auth-hero">
+        <div class="hero-eyebrow">Private Banking</div>
+
+        <h1 class="auth-title">
+          Banking built<br>for the <span class="italic-accent">modern world</span>
+        </h1>
+
+        <p class="auth-subtitle">
+          Experience a smarter, safer way to manage your money — with real-time insights,
+          instant transfers, and security you can trust.
+        </p>
+
+        <div class="auth-features">
+          <div class="feature">
+            <div class="feature-icon"><i class="fas fa-shield-halved"></i></div>
+            <span>Bank-level 256-bit encryption on every transaction</span>
+          </div>
+          <div class="feature">
+            <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+            <span>Instant transfers to 190+ countries worldwide</span>
+          </div>
+          <div class="feature">
+            <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+            <span>AI-powered analytics and smart spending insights</span>
+          </div>
+          <div class="feature">
+            <div class="feature-icon"><i class="fas fa-fingerprint"></i></div>
+            <span>Biometric authentication for seamless security</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-stats">
+        <div>
+          <div class="stat-number">2M+</div>
+          <div class="stat-label">Trusted users</div>
+        </div>
+        <div>
+          <div class="stat-number">99.9%</div>
+          <div class="stat-label">Uptime SLA</div>
+        </div>
+        <div>
+          <div class="stat-number">$4B+</div>
+          <div class="stat-label">Daily volume</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <p>Processing…</p>
+  </div>
+
+  <!-- =============================================
+       SUPABASE + WIZARD JAVASCRIPT
+  ============================================= -->
+  <script>
+    (function() {
+      'use strict';
+      
+      console.log('🚀 Wizard initializing...');
+      
+      // ===== SUPABASE CONFIGURATION =====
+      const SUPABASE_URL = 'https://fgcekyagqijztfzzicjw.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZnY2VreWFncWlqenRmenppY2p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3NjA1ODMsImV4cCI6MjA3ODMzNjU4M30.f8PIMx_u7TnXo1cmqAqlnGo71ne6XdY7hQSOjGMX1RE';
+      const EMAIL_AUTH_REDIRECT = new URL('register.html', window.location.href).href;
+
+      const PENDING_EMAIL_VERIFY_KEY = 'nexusbank_pending_email_verify';
+      const RESEND_OWNER_STORAGE_KEY = 'nexusbank_resend_owner_email';
+      /** Optional: your Resend inbox. Leave empty to auto-detect after first successful NexusBank email. */
+      const RESEND_OWNER_EMAIL = '';
+
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          detectSessionInUrl: true,
+          persistSession: true,
+          flowType: 'pkce',
+        },
+      });
+
+      const REDIRECT_URL = window.location.origin;
+
+      function normalizeEmail(email) {
+        return (email || '').trim().toLowerCase();
+      }
+
+      function getLoginErrorMessage(error) {
+        const msg = (error?.message || '').toLowerCase();
+        if (msg.includes('email not confirmed') || msg.includes('not confirmed')) {
+          return 'Your email is not confirmed in Supabase Auth yet. Finish registration verification, or run the SQL fix in supabase/confirm-auth-email.sql.';
+        }
+        if (msg.includes('invalid login') || msg.includes('invalid credentials')) {
+          return 'Invalid email or password. Use the same email you registered with (check spelling and caps).';
+        }
+        return error?.message || 'Sign in failed. Please try again.';
+      }
+
+      function setPendingEmailVerify(email) {
+        const value = normalizeEmail(email);
+        if (!value) return;
+        sessionStorage.setItem(PENDING_EMAIL_VERIFY_KEY, value);
+        localStorage.setItem(PENDING_EMAIL_VERIFY_KEY, value);
+      }
+
+      function getPendingEmailVerify() {
+        return (
+          sessionStorage.getItem(PENDING_EMAIL_VERIFY_KEY) ||
+          localStorage.getItem(PENDING_EMAIL_VERIFY_KEY)
+        );
+      }
+
+      function clearPendingEmailVerify() {
+        sessionStorage.removeItem(PENDING_EMAIL_VERIFY_KEY);
+        localStorage.removeItem(PENDING_EMAIL_VERIFY_KEY);
+      }
+
+      async function confirmSupabaseAuthEmail(email) {
+        const normalized = normalizeEmail(email);
+        if (!normalized) return false;
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (
+          session?.user &&
+          normalizeEmail(session.user.email) === normalized &&
+          session.user.email_confirmed_at
+        ) {
+          return true;
+        }
+
+        const { data, error } = await supabase.rpc('confirm_auth_email_after_verification', {
+          p_email: normalized
+        });
+
+        if (error) {
+          console.warn('confirm_auth_email_after_verification:', error.message);
+          return false;
+        }
+
+        return data === true;
+      }
+
+      async function confirmEmailForRegistration(email) {
+        const normalized = normalizeEmail(email);
+        if (!normalized) return false;
+
+        const { data, error } = await supabase.rpc('confirm_auth_email_for_registration', {
+          p_email: normalized,
+        });
+
+        if (error) {
+          console.warn('confirm_auth_email_for_registration:', error.message);
+          return false;
+        }
+
+        return data === true;
+      }
+
+      function syncWizardDataBeforeComplete() {
+        const emailField = document.getElementById('wizardEmail');
+        if (emailField?.value?.trim()) {
+          wizardData.email = normalizeEmail(emailField.value);
+        }
+
+        const nameField = document.getElementById('wizardFullName');
+        if (nameField?.value?.trim() && !wizardData.fullName) {
+          wizardData.fullName = nameField.value.trim();
+        }
+      }
+
+      async function signInAfterRegistration(email, password) {
+        const normalized = normalizeEmail(email);
+
+        if (wizardData.emailSkippedVerification || !emailVerified) {
+          await confirmEmailForRegistration(normalized);
+        } else {
+          await confirmSupabaseAuthEmail(normalized);
+          await confirmEmailForRegistration(normalized);
+        }
+
+        let result = await supabase.auth.signInWithPassword({
+          email: normalized,
+          password,
+        });
+
+        if (result.error && /not confirmed/i.test(result.error.message)) {
+          await confirmEmailForRegistration(normalized);
+          result = await supabase.auth.signInWithPassword({
+            email: normalized,
+            password,
+          });
+        }
+
+        if (result.error) {
+          throw new Error(getLoginErrorMessage(result.error));
+        }
+
+        return result.data;
+      }
+      
+      console.log('✅ Supabase client created');
+      
+      // ===== COUNTRY DATA =====
+      const countries = [
+        { name: 'United States', code: '+1', flag: '🇺🇸' },
+        { name: 'United Kingdom', code: '+44', flag: '🇬🇧' },
+        { name: 'Canada', code: '+1', flag: '🇨🇦' },
+        { name: 'Australia', code: '+61', flag: '🇦🇺' },
+        { name: 'Germany', code: '+49', flag: '🇩🇪' },
+        { name: 'France', code: '+33', flag: '🇫🇷' },
+        { name: 'Japan', code: '+81', flag: '🇯🇵' },
+        { name: 'Bulgaria', code: '+359', flag: '🇧🇬' },
+        { name: 'Spain', code: '+34', flag: '🇪🇸' },
+        { name: 'Italy', code: '+39', flag: '🇮🇹' }
+      ];
+      
+      // ===== STATE =====
+      let currentStep = 1;
+      let selectedCountry = null;
+      let emailVerified = false;
+      let phoneVerified = false;
+      let uploadedFile = null;
+      let phoneCode = '';
+      const wizardData = {};
+      const WIZARD_STORAGE_KEY = 'nexusbank_registration_wizard_v1';
+
+      function saveWizardProgress() {
+        try {
+          sessionStorage.setItem(
+            WIZARD_STORAGE_KEY,
+            JSON.stringify({
+              wizardData,
+              currentStep,
+              emailVerified,
+              phoneVerified,
+              selectedCountryName: selectedCountry?.name || wizardData.country || null,
+              emailDeliveryMode: wizardData.emailDeliveryMode,
+              emailCodeLength: wizardData.emailCodeLength,
+            })
+          );
+        } catch (e) {
+          console.warn('Could not save wizard progress', e);
+        }
+      }
+
+      function restoreWizardProgress() {
+        try {
+          const raw = sessionStorage.getItem(WIZARD_STORAGE_KEY);
+          if (!raw) return false;
+
+          const saved = JSON.parse(raw);
+          if (saved.wizardData) Object.assign(wizardData, saved.wizardData);
+
+          if (saved.selectedCountryName) {
+            const country = countries.find((c) => c.name === saved.selectedCountryName);
+            if (country) {
+              selectedCountry = country;
+              wizardData.country = country.name;
+              wizardData.countryCode = country.code;
+              document.querySelectorAll('.country-option').forEach((btn) => {
+                btn.classList.toggle('selected', btn.dataset.country === country.name);
+              });
+              const countryCodeDisplay = document.getElementById('selectedCountryCode');
+              if (countryCodeDisplay) countryCodeDisplay.textContent = country.code;
+              const nextBtn = document.getElementById('nextStep1');
+              if (nextBtn) nextBtn.disabled = false;
+            }
+          }
+
+          emailVerified = !!saved.emailVerified;
+          phoneVerified = !!saved.phoneVerified;
+          wizardData.emailDeliveryMode =
+            saved.emailDeliveryMode ?? wizardData.emailDeliveryMode ?? null;
+          wizardData.emailCodeLength = saved.emailCodeLength || 8;
+          if (saved.currentStep) currentStep = saved.currentStep;
+
+          return true;
+        } catch (e) {
+          console.warn('Could not restore wizard progress', e);
+          return false;
+        }
+      }
+
+      function clearWizardProgress() {
+        sessionStorage.removeItem(WIZARD_STORAGE_KEY);
+      }
+
+      function applyRestoredWizardUi() {
+        const emailField = document.getElementById('wizardEmail');
+        if (emailField && wizardData.email) emailField.value = wizardData.email;
+
+        if (typeof setEmailCodeLength === 'function') {
+          setEmailCodeLength(wizardData.emailCodeLength || 8);
+        }
+
+        if (wizardData.email && document.getElementById('emailVerificationSection')) {
+          const sentDisplay = document.getElementById('sentEmailDisplay');
+          if (sentDisplay) sentDisplay.textContent = wizardData.email;
+        }
+      }
+
+      // ===== DOM ELEMENTS =====
+      const overlay = document.getElementById('wizardOverlay');
+      const registerBtn = document.getElementById('wizardRegisterBtn');
+      const closeBtn = document.getElementById('wizardClose');
+      const steps = document.querySelectorAll('.wizard-step');
+      const progressSteps = document.querySelectorAll('.progress-step');
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      
+      console.log('📋 DOM Elements found:', {
+        overlay: !!overlay,
+        registerBtn: !!registerBtn,
+        closeBtn: !!closeBtn,
+        steps: steps.length,
+        progressSteps: progressSteps.length
+      });
+      
+      // ===== POPULATE COUNTRY GRID =====
+      const countryGrid = document.getElementById('countryGrid');
+      if (countryGrid) {
+        countries.forEach(country => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'country-option';
+          btn.innerHTML = `<i class="fas fa-globe"></i> ${country.flag} ${country.name}`;
+          btn.dataset.country = country.name;
+          btn.dataset.code = country.code;
+          btn.addEventListener('click', () => selectCountry(country, btn));
+          countryGrid.appendChild(btn);
+        });
+        console.log('🌍 Countries populated:', countries.length);
+      } else {
+        console.error('❌ Country grid not found!');
+      }
+      
+      function selectCountry(country, element) {
+        console.log('🌍 Country selected:', country.name);
+        document.querySelectorAll('.country-option').forEach(b => b.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedCountry = country;
+        wizardData.country = country.name;
+        wizardData.countryCode = country.code;
+        
+        const countryCodeDisplay = document.getElementById('selectedCountryCode');
+        if (countryCodeDisplay) {
+          countryCodeDisplay.textContent = country.code;
+        }
+        
+        const nextBtn = document.getElementById('nextStep1');
+        if (nextBtn) {
+          nextBtn.disabled = false;
+          console.log('✅ Next button enabled');
+        }
+
+        saveWizardProgress();
+      }
+      
+      // ===== WIZARD OPEN/CLOSE =====
+      if (registerBtn) {
+        registerBtn.addEventListener('click', () => {
+          console.log('📂 Opening wizard...');
+          overlay.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        });
+      }
+      
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          console.log('📕 Closing wizard...');
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      }
+      
+            // REMOVED: Click outside to close functionality
+      // Now only the X button can close the wizard
+      if (overlay) {
+        overlay.addEventListener('click', (e) => {
+          // Do nothing when clicking outside - wizard stays open
+          e.stopPropagation();
+        });
+      }
+      
+      // ===== NAVIGATION =====
+      function goToStep(step) {
+        console.log(`📍 Navigating to step ${step} (from ${currentStep})`);
+        
+        steps.forEach(s => s.classList.remove('active'));
+        
+        const targetStep = document.querySelector(`.wizard-step[data-step="${step}"]`);
+        if (targetStep) {
+          targetStep.classList.add('active');
+          console.log(`✅ Step ${step} activated`);
+        } else {
+          console.error(`❌ Step ${step} not found!`);
+          return;
+        }
+        
+        progressSteps.forEach((p, i) => {
+          p.classList.remove('active', 'completed');
+          if (i + 1 < step) p.classList.add('completed');
+          if (i + 1 === step) p.classList.add('active');
+        });
+        
+        currentStep = step;
+        saveWizardProgress();
+      }
+      
+      // ===== STEP 1: Country Selection =====
+      const nextStep1Btn = document.getElementById('nextStep1');
+      if (nextStep1Btn) {
+        nextStep1Btn.addEventListener('click', () => {
+          console.log('➡️ Next Step 1 clicked');
+          if (!selectedCountry) {
+            alert('Please select a country first');
+            return;
+          }
+          goToStep(2);
+        });
+      }
+      
+           // =============================================
+      // STEP 2: EMAIL VERIFICATION (Resend + Supabase OTP fallback)
+      // Resend test mode only delivers to the account owner email — OTP works for everyone.
+      // =============================================
+
+      const emailInput = document.getElementById('wizardEmail');
+      const sendCodeBtn = document.getElementById('sendVerificationCode');
+      const verifyEmailBtn = document.getElementById('verifyEmailCode');
+      const emailSection = document.getElementById('emailVerificationSection');
+      const emailCodeInputs = document.querySelectorAll('.email-code');
+      const sentEmailDisplay = document.getElementById('sentEmailDisplay');
+      const emailSentMessageText = document.getElementById('emailSentMessageText');
+      const emailVerifySubtitle = document.getElementById('emailVerifySubtitle');
+      const magicLinkHelp = document.getElementById('magicLinkHelp');
+      const resendCodeBtn = document.getElementById('resendCode');
+      const skipEmailBtn = document.getElementById('skipEmailVerification');
+
+      wizardData.emailDeliveryMode = null;
+      wizardData.emailCodeLength = 8;
+
+      let emailCooldown = false;
+      let cooldownTimer = null;
+
+      function getResendOwnerEmail() {
+        return normalizeEmail(RESEND_OWNER_EMAIL) || normalizeEmail(localStorage.getItem(RESEND_OWNER_STORAGE_KEY));
+      }
+
+      function rememberResendOwnerEmail(email) {
+        const normalized = normalizeEmail(email);
+        if (normalized) {
+          localStorage.setItem(RESEND_OWNER_STORAGE_KEY, normalized);
+        }
+      }
+
+      function isResendOwnerEmail(email) {
+        const owner = getResendOwnerEmail();
+        return !!owner && normalizeEmail(email) === owner;
+      }
+
+      function requiresEmailVerification() {
+        if (wizardData.emailDeliveryMode === 'resend') return true;
+        const email = normalizeEmail(wizardData.email || emailInput?.value);
+        return isResendOwnerEmail(email);
+      }
+
+      function canSkipEmailVerification() {
+        const email = normalizeEmail(emailInput?.value);
+        if (!email || !email.includes('@')) return false;
+        return !requiresEmailVerification();
+      }
+
+      function updateStep2EmailActions() {
+        const required = requiresEmailVerification();
+        const canSkip = canSkipEmailVerification();
+
+        if (skipEmailBtn) {
+          skipEmailBtn.style.display = canSkip ? '' : 'none';
+        }
+
+        if (required && skipEmailBtn) {
+          skipEmailBtn.style.display = 'none';
+        }
+      }
+
+      function continueWithoutEmailVerification() {
+        const email = normalizeEmail(emailInput?.value);
+
+        if (!email || !email.includes('@')) {
+          alert('Please enter a valid email address');
+          return;
+        }
+
+        if (requiresEmailVerification()) {
+          alert('This email must be verified with the 8-digit code sent to your inbox.');
+          return;
+        }
+
+        wizardData.email = email;
+        wizardData.emailSkippedVerification = true;
+        emailVerified = false;
+        clearPendingEmailVerify();
+        saveWizardProgress();
+        goToStep(3);
+      }
+
+      function getActiveEmailCodeLength() {
+        return wizardData.emailCodeLength || 8;
+      }
+
+      function setEmailCodeLength(length) {
+        wizardData.emailCodeLength = length;
+        emailCodeInputs.forEach((input, i) => {
+          input.style.display = i < length ? '' : 'none';
+          if (i >= length) input.value = '';
+        });
+        if (emailVerifySubtitle) {
+          emailVerifySubtitle.textContent =
+            length === 6
+              ? 'Enter the 6-digit code from your email (check spam too)'
+              : 'Enter the 8-digit code from your email (check spam too)';
+        }
+      }
+
+      function getEnteredEmailCode() {
+        const len = getActiveEmailCodeLength();
+        return Array.from(emailCodeInputs)
+          .slice(0, len)
+          .map((input) => input.value)
+          .join('')
+          .replace(/\D/g, '');
+      }
+
+      function updateEmailVerifyButtonState() {
+        const requiredLen = getActiveEmailCodeLength();
+        const entered = getEnteredEmailCode();
+        if (verifyEmailBtn) verifyEmailBtn.disabled = entered.length !== requiredLen;
+      }
+
+      async function sendVerificationEmail(email) {
+        const { data: fnData, error: fnError } = await supabase.functions.invoke(
+          'email-verification',
+          { body: { email, name: wizardData.fullName || '' } }
+        );
+
+        const resendDelivered =
+          !fnError && fnData?.success === true && fnData?.useSupabaseOtp !== true;
+
+        if (resendDelivered) {
+          clearPendingEmailVerify();
+          rememberResendOwnerEmail(email);
+          return {
+            mode: 'resend',
+            codeLength: 8,
+            message: '8-digit code sent',
+          };
+        }
+
+        console.warn('NexusBank email failed, using Supabase:', fnError || fnData);
+
+        const { error: otpError } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            shouldCreateUser: true,
+            emailRedirectTo: EMAIL_AUTH_REDIRECT,
+          },
+        });
+
+        if (otpError) {
+          throw new Error(
+            otpError.message || 'Could not send verification email. Try again shortly.'
+          );
+        }
+
+        setPendingEmailVerify(email);
+
+        return {
+          mode: 'supabase',
+          codeLength: 6,
+          message: 'Check your email',
+          usesMagicLink: true,
+        };
+      }
+
+      async function verifySupabaseEmailCode(email, enteredCode) {
+        const digits = (enteredCode || '').replace(/\D/g, '');
+        const tokens = [...new Set([digits, digits.slice(0, 8), digits.slice(0, 6)].filter((t) => t.length >= 6))];
+        const types = ['email', 'signup', 'magiclink'];
+
+        for (const token of tokens) {
+          for (const type of types) {
+            const { data, error } = await supabase.auth.verifyOtp({
+              email,
+              token,
+              type,
+            });
+            if (!error && data?.session) {
+              return true;
+            }
+          }
+        }
+
+        const { data: { session } } = await supabase.auth.getSession();
+        return (
+          !!session?.user &&
+          normalizeEmail(session.user.email) === normalizeEmail(email)
+        );
+      }
+
+      async function handleEmailAuthCallback() {
+        if (location.protocol === 'file:') return null;
+
+        const url = new URL(window.location.href);
+        const authCode = url.searchParams.get('code');
+        const hadHashToken = window.location.hash.includes('access_token');
+
+        if (authCode) {
+          const { error } = await supabase.auth.exchangeCodeForSession(authCode);
+          if (error) {
+            console.error('PKCE exchange failed:', error.message);
+          }
+          url.searchParams.delete('code');
+          window.history.replaceState({}, '', url.pathname + url.search);
+        }
+
+        if (hadHashToken) {
+          window.history.replaceState({}, '', window.location.pathname + window.location.search);
+        }
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return null;
+
+        const pendingEmail = getPendingEmailVerify();
+
+        if (authCode || hadHashToken || pendingEmail) {
+          return session;
+        }
+
+        return null;
+      }
+
+      async function completeEmailVerificationFromSession(session) {
+        if (!session?.user?.email || emailVerified) return false;
+
+        restoreWizardProgress();
+        applyRestoredWizardUi();
+
+        emailVerified = true;
+        wizardData.email = normalizeEmail(session.user.email);
+        if (emailInput) emailInput.value = wizardData.email;
+
+        await confirmSupabaseAuthEmail(wizardData.email);
+
+        if (overlay) overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        if (emailSection) emailSection.style.display = 'block';
+        if (sentEmailDisplay) sentEmailDisplay.textContent = wizardData.email;
+
+        goToStep(3);
+        saveWizardProgress();
+        clearPendingEmailVerify();
+
+        return true;
+      }
+
+      setEmailCodeLength(8);
+
+      emailCodeInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+          const len = getActiveEmailCodeLength();
+          e.target.value = e.target.value.replace(/[^0-9]/g, '');
+          if (e.target.value && index < len - 1) {
+            emailCodeInputs[index + 1].focus();
+          }
+          updateEmailVerifyButtonState();
+        });
+
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !e.target.value && index > 0) {
+            emailCodeInputs[index - 1].focus();
+          }
+        });
+
+        input.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const len = getActiveEmailCodeLength();
+          const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+          const cleaned = pastedText.replace(/[^0-9]/g, '').slice(0, len);
+          if (cleaned.length > 0) {
+            for (let i = 0; i < emailCodeInputs.length; i++) {
+              emailCodeInputs[i].value = i < cleaned.length ? cleaned[i] : '';
+            }
+            updateEmailVerifyButtonState();
+            emailCodeInputs[Math.min(cleaned.length, len - 1)].focus();
+          }
+        });
+      });
+
+      if (sendCodeBtn) {
+        sendCodeBtn.addEventListener('click', async () => {
+          const email = emailInput?.value.trim().toLowerCase();
+
+          if (!email || !email.includes('@')) {
+            alert('Please enter a valid email address');
+            return;
+          }
+
+          wizardData.email = email;
+
+          sendCodeBtn.disabled = true;
+          const originalText = sendCodeBtn.innerHTML;
+          sendCodeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+          let sentSuccessfully = false;
+
+          try {
+            const result = await sendVerificationEmail(email);
+            wizardData.emailDeliveryMode = result.mode;
+            wizardData.emailSkippedVerification = false;
+            setEmailCodeLength(result.codeLength);
+            updateStep2EmailActions();
+
+            if (emailSentMessageText) {
+              emailSentMessageText.textContent = result.usesMagicLink
+                ? '6-digit code or confirmation link sent to'
+                : '8-digit code sent to';
+            }
+
+            if (magicLinkHelp) {
+              magicLinkHelp.style.display = result.usesMagicLink ? 'block' : 'none';
+            }
+
+            if (sentEmailDisplay) sentEmailDisplay.textContent = email;
+            emailSection.style.display = 'block';
+            sendCodeBtn.style.display = 'none';
+            verifyEmailBtn.style.display = 'flex';
+
+            emailCodeInputs.forEach((input) => {
+              input.value = '';
+            });
+            updateEmailVerifyButtonState();
+            emailCodeInputs[0]?.focus();
+
+            startEmailCooldown();
+            sentSuccessfully = true;
+            saveWizardProgress();
+            console.log('✅ Verification email sent via', result.mode);
+          } catch (error) {
+            console.error('❌ Error:', error);
+            alert('Error: ' + error.message);
+          } finally {
+            if (!sentSuccessfully) {
+              sendCodeBtn.disabled = false;
+              sendCodeBtn.innerHTML = originalText;
+            }
+          }
+        });
+      }
+
+      if (verifyEmailBtn) {
+        verifyEmailBtn.addEventListener('click', async () => {
+          const len = getActiveEmailCodeLength();
+          const enteredCode = getEnteredEmailCode();
+
+          if (enteredCode.length !== len) {
+            alert(`Please enter all ${len} digits`);
+            return;
+          }
+
+          verifyEmailBtn.disabled = true;
+          const originalText = verifyEmailBtn.innerHTML;
+          verifyEmailBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+
+          try {
+            const email = normalizeEmail(wizardData.email);
+            let verified = false;
+
+            if (wizardData.emailDeliveryMode === 'supabase') {
+              verified = await verifySupabaseEmailCode(email, enteredCode);
+            } else {
+              const { data: isValid, error: verifyError } = await supabase.rpc('verify_code', {
+                p_email: email,
+                p_code: enteredCode,
+                p_type: 'email',
+              });
+
+              if (verifyError) {
+                console.error('Verify error:', verifyError);
+                throw new Error('Verification failed. Please try again.');
+              }
+
+              verified = isValid === true;
+            }
+
+            if (verified) {
+              emailVerified = true;
+              wizardData.emailSkippedVerification = false;
+              await confirmSupabaseAuthEmail(email);
+              clearPendingEmailVerify();
+              console.log('✅ Email verified');
+              goToStep(3);
+              saveWizardProgress();
+              return;
+            }
+
+            alert(
+              wizardData.emailDeliveryMode === 'supabase'
+                ? 'Invalid or expired code. Use the 6-digit code from the Supabase email, or click Confirm/Log In in that email (same browser, Live Server — not file://).'
+                : 'Invalid or expired code. Please request a new one.'
+            );
+            verifyEmailBtn.disabled = false;
+            verifyEmailBtn.innerHTML = originalText;
+          } catch (error) {
+            console.error('❌ Error:', error);
+            alert('Error: ' + error.message);
+            verifyEmailBtn.disabled = false;
+            verifyEmailBtn.innerHTML = originalText;
+          }
+        });
+      }
+
+      if (emailInput) {
+        emailInput.addEventListener('input', updateStep2EmailActions);
+        emailInput.addEventListener('change', updateStep2EmailActions);
+      }
+
+      if (skipEmailBtn) {
+        skipEmailBtn.addEventListener('click', continueWithoutEmailVerification);
+      }
+
+      updateStep2EmailActions();
+
+      // ===== RESEND CODE =====
+      if (resendCodeBtn) {
+        resendCodeBtn.addEventListener('click', () => {
+          if (emailCooldown) {
+            alert('Please wait before requesting another code');
+            return;
+          }
+          emailCodeInputs.forEach(input => input.value = '');
+          verifyEmailBtn.disabled = true;
+          sendCodeBtn.click();
+        });
+      }
+      
+      // ===== COOLDOWN TIMER =====
+      function startEmailCooldown() {
+        emailCooldown = true;
+        let seconds = 60;
+        
+        if (resendCodeBtn) {
+          resendCodeBtn.disabled = true;
+          
+          if (cooldownTimer) clearInterval(cooldownTimer);
+          
+          cooldownTimer = setInterval(() => {
+            seconds--;
+            if (resendCodeBtn) {
+              resendCodeBtn.innerHTML = `<i class="fas fa-clock"></i> Resend in ${seconds}s`;
+            }
+            
+            if (seconds <= 0) {
+              clearInterval(cooldownTimer);
+              cooldownTimer = null;
+              emailCooldown = false;
+              if (resendCodeBtn) {
+                resendCodeBtn.disabled = false;
+                resendCodeBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Resend Code';
+              }
+            }
+          }, 1000);
+        }
+      }
+      
+      supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session && getPendingEmailVerify()) {
+          await completeEmailVerificationFromSession(session);
+        }
+      });
+
+      (async function initRegistrationPage() {
+        const session = await handleEmailAuthCallback();
+        if (session) {
+          await completeEmailVerificationFromSession(session);
+          console.log('✅ Email verification ready (returned from email link)');
+          return;
+        }
+
+        const restored = restoreWizardProgress();
+        if (restored) {
+          applyRestoredWizardUi();
+          const resumeStep =
+            emailVerified || wizardData.emailSkippedVerification
+              ? Math.max(currentStep, 3)
+              : Math.max(currentStep, 1);
+          if (overlay) overlay.classList.add('active');
+          document.body.style.overflow = 'hidden';
+          goToStep(resumeStep);
+
+          if (emailVerified && resumeStep >= 2) {
+            if (emailSection) emailSection.style.display = 'block';
+            if (sendCodeBtn) sendCodeBtn.style.display = 'none';
+            if (verifyEmailBtn) verifyEmailBtn.style.display = 'flex';
+          }
+        }
+
+        console.log('✅ Email verification ready');
+      })();
+      
+      // ===== GOOGLE SIGNUP =====
+      document.getElementById('googleSignup')?.addEventListener('click', async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: REDIRECT_URL + '/accounts.html' }
+        });
+        if (error) alert('Google signup error: ' + error.message);
+      });
+      
+      // ===== APPLE SIGNUP =====
+      document.getElementById('appleSignup')?.addEventListener('click', async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'apple',
+          options: { redirectTo: REDIRECT_URL + '/accounts.html' }
+        });
+        if (error) alert('Apple signup error: ' + error.message);
+      });
+      
+     // ===== PHONE NUMBER LENGTHS BY COUNTRY =====
+const phoneLengths = {
+  'United States': 10,
+  'United Kingdom': 10,
+  'Canada': 10,
+  'Australia': 9,
+  'Germany': [10, 11],
+  'France': 9,
+  'Japan': [9, 10],
+  'Bulgaria': 9,
+  'Spain': 9,
+  'Italy': [9, 10]
+};
+
+// Function to validate phone number length
+function isValidPhoneLength(countryName, phoneNumber) {
+  const expectedLength = phoneLengths[countryName];
+  const digitsOnly = phoneNumber.replace(/\D/g, '');
+  
+  if (!expectedLength) {
+    console.warn('Unknown country:', countryName);
+    return digitsOnly.length >= 7; // Fallback minimum
+  }
+  
+  if (Array.isArray(expectedLength)) {
+    return expectedLength.includes(digitsOnly.length);
+  }
+  
+  return digitsOnly.length === expectedLength;
+}
+
+// ===== STEP 3: Phone Verification =====
+const phoneInput = document.getElementById('wizardPhone');
+const sendPhoneBtn = document.getElementById('sendPhoneCode');
+const verifyPhoneBtn = document.getElementById('verifyPhoneCode');
+const phoneSection = document.getElementById('phoneVerificationSection');
+const countryCodeDisplay = document.getElementById('selectedCountryCode');
+let phoneCooldown = false;
+let phoneCooldownTimer = null;
+
+// Show phone length requirement
+function updatePhoneHint() {
+  if (!selectedCountry || !phoneInput) return;
+  
+  const expectedLength = phoneLengths[selectedCountry.name];
+  let hintText = '';
+  
+  if (Array.isArray(expectedLength)) {
+    hintText = `Enter ${expectedLength.join(' or ')} digits`;
+  } else {
+    hintText = `Enter ${expectedLength} digits`;
+  }
+  
+  // Add hint below phone input if not exists
+  let hintEl = document.getElementById('phoneHint');
+  if (!hintEl) {
+    hintEl = document.createElement('div');
+    hintEl.id = 'phoneHint';
+    hintEl.style.cssText = 'color: var(--text-3); font-size: 0.8rem; margin-top: 8px; text-align: center;';
+    phoneInput.parentElement.parentElement.appendChild(hintEl);
+  }
+  hintEl.textContent = hintText;
+}
+
+// Call when country is selected
+const originalSelectCountry = selectCountry;
+selectCountry = function(country, element) {
+  originalSelectCountry(country, element);
+  saveWizardProgress();
+  updatePhoneHint();
+  
+  // Reset phone input and verification
+  if (phoneInput) phoneInput.value = '';
+  if (phoneSection) phoneSection.style.display = 'none';
+  if (sendPhoneBtn) sendPhoneBtn.style.display = 'flex';
+  if (verifyPhoneBtn) verifyPhoneBtn.style.display = 'none';
+  
+  // Reset code inputs
+  document.querySelectorAll('.phone-code').forEach(input => input.value = '');
+};
+
+// Format phone input to show groups
+if (phoneInput) {
+  phoneInput.addEventListener('input', (e) => {
+    // Remove all non-digits
+    let value = e.target.value.replace(/\D/g, '');
+    
+    // Get max length for current country
+    if (selectedCountry) {
+      const expectedLength = phoneLengths[selectedCountry.name];
+      let maxLength;
+      
+      if (Array.isArray(expectedLength)) {
+        maxLength = Math.max(...expectedLength);
+      } else if (expectedLength) {
+        maxLength = expectedLength;
+      }
+      
+      if (maxLength) {
+        value = value.slice(0, maxLength);
+      }
+    }
+    
+    // Format with spaces (e.g., 555 123 4567)
+    if (value.length > 6) {
+      value = value.slice(0, 3) + ' ' + value.slice(3, 6) + ' ' + value.slice(6);
+    } else if (value.length > 3) {
+      value = value.slice(0, 3) + ' ' + value.slice(3);
+    }
+    
+    e.target.value = value;
+    
+    // Update send button state
+    if (sendPhoneBtn) {
+      const digitsOnly = value.replace(/\D/g, '');
+      if (selectedCountry) {
+        sendPhoneBtn.disabled = !isValidPhoneLength(selectedCountry.name, digitsOnly);
+      } else {
+        sendPhoneBtn.disabled = digitsOnly.length < 7;
+      }
+    }
+  });
+}
+
+// Send phone code
+if (sendPhoneBtn) {
+  sendPhoneBtn.addEventListener('click', async () => {
+    if (!phoneInput) return;
+    
+    const phoneRaw = phoneInput.value.replace(/\D/g, '');
+    
+    if (!selectedCountry) {
+      alert('Please go back and select a country first');
+      return;
+    }
+    
+    if (!isValidPhoneLength(selectedCountry.name, phoneRaw)) {
+      const expectedLength = phoneLengths[selectedCountry.name];
+      let msg = 'Please enter a valid phone number (';
+      
+      if (Array.isArray(expectedLength)) {
+        msg += expectedLength.join(' or ') + ' digits';
+      } else {
+        msg += expectedLength + ' digits';
+      }
+      
+      alert(msg + ')');
+      return;
+    }
+    
+    wizardData.phone = `${wizardData.countryCode}${phoneRaw}`;
+    phoneCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Show verification section
+    document.getElementById('sentPhoneDisplay').textContent = wizardData.phone;
+    phoneSection.style.display = 'block';
+    sendPhoneBtn.style.display = 'none';
+    verifyPhoneBtn.style.display = 'flex';
+    
+    // Reset code inputs
+    document.querySelectorAll('.phone-code').forEach(input => input.value = '');
+    verifyPhoneBtn.disabled = true;
+    
+    // Focus first input
+    const firstInput = document.querySelector('.phone-code');
+    if (firstInput) firstInput.focus();
+    
+    // For development/demo
+    console.log('📱 Demo SMS code:', phoneCode);
+    alert(`Demo SMS code: ${phoneCode}\nSent to: ${wizardData.phone}`);
+    
+    // Start cooldown for resend
+    startPhoneCooldown();
+  });
+}
+
+// Phone code inputs
+document.querySelectorAll('.phone-code').forEach((input, index, inputs) => {
+  input.addEventListener('input', (e) => {
+    // Only allow numbers
+    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    
+    if (e.target.value && index < inputs.length - 1) {
+      inputs[index + 1].focus();
+    }
+    
+    // Check if all 6 digits entered
+    const entered = Array.from(inputs).map(i => i.value).join('');
+    if (verifyPhoneBtn) {
+      verifyPhoneBtn.disabled = entered.length !== 6;
+    }
+  });
+  
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+      inputs[index - 1].focus();
+      inputs[index - 1].value = '';
+      const entered = Array.from(inputs).map(i => i.value).join('');
+      if (verifyPhoneBtn) verifyPhoneBtn.disabled = entered.length !== 6;
+    }
+  });
+  
+  input.addEventListener('paste', (e) => {
+    e.preventDefault();
+    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+    const cleaned = pastedText.replace(/[^0-9]/g, '').slice(0, 6);
+    
+    for (let i = 0; i < inputs.length; i++) {
+      inputs[i].value = i < cleaned.length ? cleaned[i] : '';
+    }
+    
+    if (verifyPhoneBtn) {
+      verifyPhoneBtn.disabled = cleaned.length !== 6;
+    }
+    
+    const lastIndex = Math.min(cleaned.length, 5);
+    inputs[lastIndex].focus();
+  });
+});
+
+// Verify phone code
+if (verifyPhoneBtn) {
+  verifyPhoneBtn.addEventListener('click', () => {
+    const entered = Array.from(document.querySelectorAll('.phone-code'))
+      .map(i => i.value)
+      .join('');
+    
+    if (entered.length !== 6) {
+      alert('Please enter all 6 digits of the verification code');
+      return;
+    }
+    
+    if (entered === phoneCode) {
+      phoneVerified = true;
+      console.log('✅ Phone verified!');
+      goToStep(4);
+    } else {
+      alert('Invalid verification code. Please try again.');
+      // Clear inputs for retry
+      document.querySelectorAll('.phone-code').forEach(input => input.value = '');
+      const firstInput = document.querySelector('.phone-code');
+      if (firstInput) firstInput.focus();
+    }
+  });
+}
+
+// Resend SMS code
+document.getElementById('resendSmsCode')?.addEventListener('click', () => {
+  if (phoneCooldown) {
+    alert('Please wait before requesting another code');
+    return;
+  }
+  
+  phoneCode = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log('📱 New SMS code:', phoneCode);
+  alert(`New SMS code: ${phoneCode}\nSent to: ${wizardData.phone}`);
+  
+  // Reset code inputs
+  document.querySelectorAll('.phone-code').forEach(input => input.value = '');
+  if (verifyPhoneBtn) verifyPhoneBtn.disabled = true;
+  
+  // Focus first input
+  const firstInput = document.querySelector('.phone-code');
+  if (firstInput) firstInput.focus();
+  
+  startPhoneCooldown();
+});
+
+// Phone cooldown timer
+function startPhoneCooldown() {
+  phoneCooldown = true;
+  let seconds = 60;
+  const resendBtn = document.getElementById('resendSmsCode');
+  
+  if (resendBtn) {
+    resendBtn.disabled = true;
+    
+    if (phoneCooldownTimer) clearInterval(phoneCooldownTimer);
+    
+    phoneCooldownTimer = setInterval(() => {
+      seconds--;
+      if (resendBtn) {
+        resendBtn.innerHTML = `<i class="fas fa-clock"></i> Resend in ${seconds}s`;
+      }
+      
+      if (seconds <= 0) {
+        clearInterval(phoneCooldownTimer);
+        phoneCooldownTimer = null;
+        phoneCooldown = false;
+        if (resendBtn) {
+          resendBtn.disabled = false;
+          resendBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Resend SMS';
+        }
+      }
+    }, 1000);
+  }
+}
+
+// Cleanup on wizard close
+function cleanupPhoneVerification() {
+  if (phoneCooldownTimer) {
+    clearInterval(phoneCooldownTimer);
+    phoneCooldownTimer = null;
+    phoneCooldown = false;
+  }
+  
+  // Reset UI
+  if (phoneSection) phoneSection.style.display = 'none';
+  if (sendPhoneBtn) sendPhoneBtn.style.display = 'flex';
+  if (verifyPhoneBtn) verifyPhoneBtn.style.display = 'none';
+  if (phoneInput) phoneInput.value = '';
+  document.querySelectorAll('.phone-code').forEach(input => input.value = '');
+}
+
+// Add cleanup to wizard close
+if (closeBtn) {
+  const originalCloseHandler = closeBtn.onclick;
+  closeBtn.addEventListener('click', () => {
+    cleanupPhoneVerification();
+  });
+}
+      
+      // ===== STEP 4: Full Name =====
+      const nameInput = document.getElementById('wizardFullName');
+      const nextName = document.getElementById('nextFromName');
+      
+      if (nameInput && nextName) {
+        nameInput.addEventListener('input', () => {
+          nextName.disabled = !nameInput.value.trim();
+        });
+        
+        nextName.addEventListener('click', () => {
+          wizardData.fullName = nameInput.value.trim();
+          goToStep(5);
+        });
+      }
+      
+            // ===== STEP 5: Address =====
+      const addressInput = document.getElementById('wizardAddress');
+      const cityInput = document.getElementById('wizardCity');
+      const postalInput = document.getElementById('wizardPostal');
+      const nextAddress = document.getElementById('nextFromAddress');
+      
+      // Postal code validation
+      if (postalInput) {
+        postalInput.addEventListener('input', (e) => {
+          // Allow only letters, numbers, spaces, and hyphens
+          e.target.value = e.target.value.replace(/[^a-zA-Z0-9\s-]/g, '');
+          
+          // Limit to 10 characters
+          if (e.target.value.length > 10) {
+            e.target.value = e.target.value.slice(0, 10);
+          }
+        });
+        
+        postalInput.addEventListener('blur', () => {
+          const value = postalInput.value.trim();
+          // Remove spaces for length check
+          const cleanValue = value.replace(/[\s-]/g, '');
+          
+          // Check if between 3 and 10 characters (alphanumeric)
+          if (value && (cleanValue.length < 3 || cleanValue.length > 10)) {
+            postalInput.style.borderColor = '#E84393';
+            
+            // Show error message
+            let errorEl = document.getElementById('postalError');
+            if (!errorEl) {
+              errorEl = document.createElement('div');
+              errorEl.id = 'postalError';
+              errorEl.style.cssText = 'color: #E84393; font-size: 0.8rem; margin-top: 4px;';
+              postalInput.parentElement.appendChild(errorEl);
+            }
+            errorEl.textContent = 'Postal code must be 3-10 characters';
+          } else {
+            postalInput.style.borderColor = '';
+            const errorEl = document.getElementById('postalError');
+            if (errorEl) errorEl.remove();
+          }
+        });
+      }
+      
+      if (addressInput && cityInput && nextAddress) {
+        function checkAddress() {
+          const addressValid = addressInput.value.trim().length > 0;
+          const cityValid = cityInput.value.trim().length > 0;
+          let postalValid = true;
+          
+          // Validate postal code if entered
+          if (postalInput && postalInput.value.trim()) {
+            const cleanPostal = postalInput.value.trim().replace(/[\s-]/g, '');
+            postalValid = cleanPostal.length >= 3 && cleanPostal.length <= 10;
+          }
+          
+          nextAddress.disabled = !addressValid || !cityValid || !postalValid;
+        }
+        
+        addressInput.addEventListener('input', checkAddress);
+        cityInput.addEventListener('input', checkAddress);
+        if (postalInput) postalInput.addEventListener('input', checkAddress);
+        
+        nextAddress.addEventListener('click', () => {
+          wizardData.address = addressInput.value.trim();
+          wizardData.city = cityInput.value.trim();
+          wizardData.postalCode = postalInput?.value.trim() || '';
+          goToStep(6);
+        });
+      }
+      
+                // ===== STEP 6: Age & Occupation =====
+      const ageInput = document.getElementById('wizardAge');
+      const occupationInput = document.getElementById('wizardOccupation');
+      const nextDetails = document.getElementById('nextFromDetails');
+      const ageHint = document.getElementById('ageHint');
+      
+      if (ageInput) {
+        // Only allow numbers
+        ageInput.addEventListener('input', (e) => {
+          // Remove any non-numeric characters
+          let value = e.target.value.replace(/[^0-9]/g, '');
+          
+          // Limit to 3 digits
+          if (value.length > 3) {
+            value = value.slice(0, 3);
+          }
+          
+          e.target.value = value;
+          
+          // Validate age range
+          const age = parseInt(value);
+          
+          if (value === '') {
+            // Empty - no validation yet
+            ageInput.style.borderColor = '';
+            if (ageHint) {
+              ageHint.textContent = 'Must be between 18 and 100 years old';
+              ageHint.style.color = 'var(--text-3)';
+            }
+          } else if (isNaN(age) || age < 18 || age > 100) {
+            // Invalid age
+            ageInput.style.borderColor = '#E84393';
+            if (ageHint) {
+              if (age < 18) {
+                ageHint.textContent = 'You must be at least 18 years old to register';
+              } else if (age > 100) {
+                ageHint.textContent = 'Please enter a valid age (18-100)';
+              } else {
+                ageHint.textContent = 'Please enter a valid age between 18 and 100';
+              }
+              ageHint.style.color = '#E84393';
+            }
+          } else {
+            // Valid age
+            ageInput.style.borderColor = '#00B894';
+            if (ageHint) {
+              ageHint.textContent = '✓ Valid age';
+              ageHint.style.color = '#00B894';
+            }
+          }
+          
+          checkDetails();
+        });
+        
+        // Prevent non-numeric input from paste
+        ageInput.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+          const cleaned = pastedText.replace(/[^0-9]/g, '').slice(0, 3);
+          ageInput.value = cleaned;
+          
+          // Trigger input event for validation
+          ageInput.dispatchEvent(new Event('input'));
+        });
+        
+        // Prevent typing non-numeric keys
+        ageInput.addEventListener('keydown', (e) => {
+          // Allow: backspace, delete, tab, escape, enter, arrows
+          const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+          
+          if (allowedKeys.includes(e.key)) {
+            return; // Allow these keys
+          }
+          
+          // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+          if ((e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())) {
+            return;
+          }
+          
+          // Block if not a number
+          if (!/^[0-9]$/.test(e.key)) {
+            e.preventDefault();
+          }
+          
+          // Block if already 3 digits and not replacing selection
+          const currentValue = e.target.value;
+          if (currentValue.length >= 3 && !e.target.selectionStart !== e.target.selectionEnd) {
+            e.preventDefault();
+          }
+        });
+      }
+      
+      if (ageInput && occupationInput && nextDetails) {
+        function checkDetails() {
+          const ageValue = parseInt(ageInput.value);
+          const ageValid = ageInput.value !== '' && ageValue >= 18 && ageValue <= 100;
+          const occupationValid = occupationInput.value.trim().length > 0;
+          
+          nextDetails.disabled = !ageValid || !occupationValid;
+        }
+        
+        ageInput.addEventListener('input', checkDetails);
+        occupationInput.addEventListener('input', checkDetails);
+        
+        nextDetails.addEventListener('click', () => {
+          wizardData.age = parseInt(ageInput.value);
+          wizardData.occupation = occupationInput.value.trim();
+          goToStep(7);
+        });
+      }
+         // ===== STEP 7: ID Verification (WITH IMAGE PREVIEW) =====
+const idType = document.getElementById('wizardIdType');
+const fileInput = document.getElementById('wizardIdDocument');
+const filePreview = document.getElementById('wizardFilePreview');
+const fileName = document.getElementById('wizardFileName');
+const removeFile = document.getElementById('wizardRemoveFile');
+const nextId = document.getElementById('nextFromId');
+
+// Create preview image if it doesn't exist in HTML
+let previewImage = document.getElementById('wizardPreviewImage');
+if (!previewImage && filePreview) {
+  previewImage = document.createElement('img');
+  previewImage.id = 'wizardPreviewImage';
+  previewImage.style.cssText = `
+    max-width: 200px;
+    max-height: 150px;
+    border-radius: 8px;
+    margin-top: 10px;
+    display: none;
+    object-fit: contain;
+    border: 2px solid var(--border);
+  `;
+  filePreview.appendChild(previewImage);
+}
+
+if (idType && fileInput && nextId) {
+  function checkId() {
+    nextId.disabled = !idType.value || !uploadedFile;
+  }
+  
+  idType.addEventListener('change', () => {
+    if (idType.value) {
+      idType.style.borderColor = '#00B894';
+    } else {
+      idType.style.borderColor = '';
+    }
+    checkId();
+  });
+  
+  // File upload handling with preview
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (file) {
+      // Check file size (10MB max)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size must be less than 10MB');
+        fileInput.value = '';
+        return;
+      }
+      
+      // Check file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please upload a JPG, PNG, or PDF file');
+        fileInput.value = '';
+        return;
+      }
+      
+      uploadedFile = file;
+      if (fileName) fileName.textContent = file.name;
+      if (filePreview) filePreview.style.display = 'flex';
+      
+      // SHOW IMAGE PREVIEW
+      if (previewImage && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImage.src = e.target.result;
+          previewImage.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else if (previewImage) {
+        // For PDFs, show an icon
+        previewImage.style.display = 'none';
+      }
+    }
+    checkId();
+  });
+  
+  // Drag and drop support
+  const fileUpload = document.getElementById('wizardFileUpload');
+  if (fileUpload) {
+    fileUpload.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileUpload.style.borderColor = 'var(--primary)';
+      fileUpload.style.background = 'rgba(108, 92, 231, 0.1)';
+    });
+    
+    fileUpload.addEventListener('dragleave', () => {
+      fileUpload.style.borderColor = '';
+      fileUpload.style.background = '';
+    });
+    
+    fileUpload.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileUpload.style.borderColor = '';
+      fileUpload.style.background = '';
+      
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+      }
+    });
+  }
+  
+  if (removeFile) {
+    removeFile.addEventListener('click', () => {
+      fileInput.value = '';
+      if (filePreview) filePreview.style.display = 'none';
+      if (previewImage) {
+        previewImage.style.display = 'none';
+        previewImage.src = '';
+      }
+      uploadedFile = null;
+      checkId();
+    });
+  }
+  
+  nextId.addEventListener('click', () => {
+    wizardData.idType = idType.value;
+    wizardData.idTypeLabel = idType.options[idType.selectedIndex].text;
+    goToStep(8);
+  });
+}
+      
+    // ===== STEP 8: Password Setup =====
+const pwInput = document.getElementById('wizardPassword');
+const confirmPw = document.getElementById('wizardConfirmPassword');
+const pwMismatch = document.getElementById('wizardPwMismatch');
+const strBar = document.getElementById('wizardStrengthBar');
+const strLabel = document.getElementById('wizardStrengthLabel');
+const completeBtn = document.getElementById('completeRegistration');
+
+if (pwInput && confirmPw && completeBtn) {
+  function checkPasswordStrength(pw) {
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[a-z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    
+    const colors = ['', '#E84393', '#FDCB6E', '#FDCB6E', '#00B894', '#00B894'];
+    const texts = ['', 'Weak', 'Fair', 'Fair', 'Strong', 'Very strong'];
+    
+    if (strBar) strBar.style.width = (score / 5 * 100) + '%';
+    if (strBar) strBar.style.background = colors[score] || '';
+    if (strLabel) strLabel.textContent = pw ? texts[score] : 'Enter a password';
+    
+    return score >= 4;
+  }
+  
+  function checkPasswords() {
+    const pw = pwInput.value;
+    const confirm = confirmPw.value;
+    const isStrong = checkPasswordStrength(pw);
+    const match = pw && pw === confirm;
+    
+    if (pwMismatch) pwMismatch.style.display = confirm && !match ? 'block' : 'none';
+    completeBtn.disabled = !(isStrong && match);
+    
+    return isStrong && match;
+  }
+  
+  pwInput.addEventListener('input', checkPasswords);
+  confirmPw.addEventListener('input', checkPasswords);
+  
+  // ══════════════════════════════════════════
+// COMPLETE REGISTRATION - WITH RATE LIMIT HANDLING
+// ══════════════════════════════════════════
+completeBtn.addEventListener('click', async () => {
+  if (!checkPasswords()) {
+    alert('Please ensure your passwords match and are strong enough');
+    return;
+  }
+  
+  // Save password
+  wizardData.password = pwInput.value;
+  
+  // Show loading
+  loadingOverlay.style.display = 'flex';
+  completeBtn.disabled = true;
+  
+  try {
+    syncWizardDataBeforeComplete();
+
+    if (!wizardData.email || !wizardData.email.includes('@')) {
+      throw new Error('Email is missing. Go back to step 2 and enter your email.');
+    }
+
+    if (!wizardData.fullName) {
+      throw new Error('Full name is missing. Go back to step 4 and enter your name.');
+    }
+
+    console.log('🔐 Starting registration...');
+    console.log('📧 Email:', wizardData.email);
+    console.log('👤 Name:', wizardData.fullName);
+
+    let userId = null;
+
+    const { data: { session: otpSession } } = await supabase.auth.getSession();
+    if (
+      otpSession?.user &&
+      normalizeEmail(otpSession.user.email) === normalizeEmail(wizardData.email)
+    ) {
+      console.log('📝 Setting password for user verified via email OTP...');
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: wizardData.password,
+      });
+      if (updateError) {
+        throw new Error(updateError.message || 'Could not set your password.');
+      }
+      await confirmSupabaseAuthEmail(wizardData.email);
+      userId = otpSession.user.id;
+    } else {
+      console.log('📝 Creating auth user...');
+
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: wizardData.email,
+        password: wizardData.password,
+        options: {
+          data: {
+            full_name: wizardData.fullName,
+            phone: wizardData.phone || '',
+          },
+        },
+      });
+
+      if (signUpError) {
+        console.error('❌ SignUp error:', signUpError.message);
+
+        if (
+          signUpError.message.includes('rate limit') ||
+          signUpError.message.includes('too many')
+        ) {
+          throw new Error(
+            'Please wait a moment before trying again. For security, we limit how often you can create accounts.'
+          );
+        }
+
+        if (
+          signUpError.message.includes('already registered') ||
+          signUpError.message.includes('already exists')
+        ) {
+          console.log('⚠️ User exists, signing in and saving profile...');
+          const signInData = await signInAfterRegistration(
+            wizardData.email,
+            wizardData.password
+          );
+          userId = signInData.user.id;
+        } else {
+          throw signUpError;
+        }
+      } else if (!authData?.user) {
+        throw new Error('User creation failed. Please try again.');
+      } else if (authData.session?.user) {
+        userId = authData.session.user.id;
+        console.log('✅ User created with session:', userId);
+      } else {
+        console.log('⚠️ User created without session — confirming email and signing in...');
+        const signInData = await signInAfterRegistration(
+          wizardData.email,
+          wizardData.password
+        );
+        userId = signInData.user.id;
+      }
+    }
+
+    if (!userId) {
+      throw new Error('Could not create your account. Please try again.');
+    }
+
+    await saveUserProfile(userId);
+  } catch (error) {
+    console.error('❌ Registration error:', error);
+    loadingOverlay.style.display = 'none';
+    completeBtn.disabled = false;
+    alert('Registration failed: ' + error.message);
+  }
+});
+
+// ══════════════════════════════════════════
+// SAVE PROFILE FUNCTION - WORKING VERSION
+// ══════════════════════════════════════════
+async function saveUserProfile(userId) {
+  try {
+    console.log('💾 Saving profile for user ID:', userId);
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user || session.user.id !== userId) {
+      throw new Error('Sign-in did not complete. Your profile was not saved — please try again.');
+    }
+    
+    // Prepare profile data
+    const profileData = {
+      id: userId,
+      full_name: wizardData.fullName,
+      email: wizardData.email,
+      phone: wizardData.phone || null,
+      country: wizardData.country || null,
+      country_code: wizardData.countryCode || null,
+      address: wizardData.address || null,
+      city: wizardData.city || null,
+      postal_code: wizardData.postalCode || null,
+      age: parseInt(wizardData.age) || null,
+      occupation: wizardData.occupation || null,
+      id_type: wizardData.idType || null,
+      document_url: null,
+      email_verified: emailVerified || false,
+      phone_verified: phoneVerified || false,
+      account_status: 'active',
+      kyc_status: 'pending',
+      updated_at: new Date().toISOString(),
+    };
+    
+    console.log('📤 Profile data:', profileData);
+    
+    // Upload document if exists
+   // Upload document if exists
+if (uploadedFile) {
+  try {
+    const fileExt = uploadedFile.name.split('.').pop();
+    const filePath = `${userId}/id-${Date.now()}.${fileExt}`;
+    
+    console.log('📎 Uploading document to:', filePath);
+    console.log('📁 File type:', uploadedFile.type);
+    console.log('📏 File size:', (uploadedFile.size / 1024).toFixed(2), 'KB');
+    
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('id-documents')
+      .upload(filePath, uploadedFile, {
+        cacheControl: '3600',
+        upsert: false
+      });
+    
+    if (uploadError) {
+      console.error('❌ Upload error details:', uploadError);
+      throw new Error('Failed to upload document: ' + uploadError.message);
+    }
+    
+    console.log('✅ File uploaded successfully:', uploadData);
+    
+    // Get the public URL for the uploaded file
+    const { data: urlData } = supabase.storage
+      .from('id-documents')
+      .getPublicUrl(filePath);
+    
+    if (urlData?.publicUrl) {
+      profileData.document_url = urlData.publicUrl;
+      console.log('🔗 Public URL:', urlData.publicUrl);
+      console.log('📸 You can now view this image at:', urlData.publicUrl);
+    } else {
+      // Fallback: construct URL manually
+      profileData.document_url = `${SUPABASE_URL}/storage/v1/object/public/id-documents/${filePath}`;
+      console.log('🔗 Constructed URL:', profileData.document_url);
+    }
+    
+  } catch (e) {
+    console.error('❌ Upload error:', e.message);
+    // Don't throw - continue with registration even if upload fails
+    console.warn('⚠️ Continuing without document');
+  }
+}
+    
+    console.log('💾 Saving profile to database...');
+    const { data: savedRows, error: upsertError } = await supabase
+      .from('profiles')
+      .upsert(profileData, { onConflict: 'id' })
+      .select();
+
+    if (upsertError) {
+      console.error('❌ Profile save error:', upsertError);
+      throw new Error(
+        'Could not save your profile: ' +
+          upsertError.message +
+          '. Run supabase/profiles-registration-rls.sql in the Supabase SQL Editor if this is a permissions error.'
+      );
+    }
+
+    console.log('✅ Profile saved successfully!');
+    console.log('📊 Saved data:', savedRows);
+
+    const { error: bankingError } = await supabase.rpc('ensure_user_banking');
+    if (bankingError) {
+      console.warn('⚠️ Banking setup:', bankingError.message);
+    } else {
+      console.log('✅ Banking accounts initialized ($20,000 welcome balance)');
+    }
+    
+    // Verify the save
+    const { data: savedProfile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (savedProfile) {
+      console.log('✅ Verified - Profile exists in database');
+      console.log('   Name:', savedProfile.full_name);
+      console.log('   Email:', savedProfile.email);
+    }
+    
+    // Success!
+    loadingOverlay.style.display = 'none';
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    
+    clearWizardProgress();
+
+    alert('✅ Registration successful!\n\nWelcome to NexusBank, ' + wizardData.fullName + '!\n\nYou can now login with:\nEmail: ' + wizardData.email);
+    
+    setTimeout(() => {
+      window.location.href = 'accounts.html';
+    }, 1500);
+    
+  } catch (error) {
+    console.error('❌ Profile save error:', error);
+    throw error;
+  }
+}
+}
+      
+      
+      // ===== Password Toggle =====
+      document.querySelectorAll('.toggle-pw').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const input = document.getElementById(btn.dataset.target);
+          const icon = btn.querySelector('i');
+          if (input) {
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+          }
+        });
+      });
+      
+      // ===== Back Navigation =====
+      document.querySelectorAll('[data-prev]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (currentStep > 1) {
+            goToStep(currentStep - 1);
+          }
+        });
+      });
+      
+      // ===== ESC Key =====
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) {
+          overlay.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+      
+      console.log('✅ Wizard ready!');
+      
+    })();
+  </script>
+</body>
+</html>

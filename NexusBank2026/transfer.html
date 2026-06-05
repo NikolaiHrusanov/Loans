@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en" class="dark-theme">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instant Transfers | NexusBank</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+  <link rel="stylesheet" href="css/transfer.css" />
+</head>
+<body>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="app-container">
+
+  <!-- ══════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="dashboard.html" class="brand">
+      <div class="brand-logo"><i class="fas fa-bolt"></i></div>
+      <span>Nexus<span class="brand-accent">Bank</span></span>
+    </a>
+  </div>
+
+  <!-- Logged-in user -->
+ <div class="sidebar-user">
+    <div class="user-avatar"></div>
+    <div class="user-name"></div>
+    <div class="user-email"></div>
+
+</div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">BANKING</div>
+      <a href="accounts.html" class="nav-item">
+        <div class="nav-item-icon"><i class="fas fa-wallet"></i></div>
+        <span>Accounts</span>
+      </a>
+      <a href="transactions.html" class="nav-item">
+        <div class="nav-item-icon"><i class="fas fa-history"></i></div>
+        <span>Transactions</span>
+      </a>
+      <a href="transfer.html" class="nav-item active">
+        <div class="nav-item-icon"><i class="fas fa-exchange-alt"></i></div>
+        <span>Transfers</span>
+      </a>
+      <a href="cards.html" class="nav-item">
+        <div class="nav-item-icon"><i class="fas fa-credit-card"></i></div>
+        <span>Cards</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">FINANCES</div>
+      <a href="savings.html" class="nav-item">
+        <div class="nav-item-icon"><i class="fas fa-piggy-bank"></i></div>
+        <span>Savings</span>
+      </a>
+      <a href="#" class="nav-item">
+        <div class="nav-item-icon"><i class="fas fa-hand-holding-usd"></i></div>
+        <span>Loans</span>
+      </a>
+      <a href="#" class="nav-item">
+        <div class="nav-item-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+        <span>Bills</span>
+      </a>
+      <a href="#" class="nav-item">
+        <div class="nav-item-icon"><i class="fas fa-file-alt"></i></div>
+        <span>Statements</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">ACCOUNT</div>
+      <a href="#" class="nav-item">
+        <div class="nav-item-icon"><i class="fas fa-user-circle"></i></div>
+        <span>Profile</span>
+      </a>
+      <a href="#" class="nav-item">
+        <div class="nav-item-icon"><i class="fas fa-shield-alt"></i></div>
+        <span>Security</span>
+      </a>
+      <a href="#" class="nav-item">
+        <div class="nav-item-icon"><i class="fas fa-question-circle"></i></div>
+        <span>Help</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="index.html" class="btn-ghost">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Sign Out</span>
+    </a>
+  </div>
+</aside>
+
+    <!-- ══════════════════════════════════════
+         MAIN CONTENT
+    ══════════════════════════════════════ -->
+    <main class="main-content">
+
+      <!-- Header -->
+      <header class="main-header">
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="header-title">
+          <h1>Instant Transfers</h1>
+          <p>Send money anywhere in seconds, for free</p>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn-secondary" id="viewScheduleBtn">
+            <i class="fas fa-calendar"></i>
+            <span>Scheduled</span>
+          </button>
+          <button class="btn-secondary" id="viewHistoryBtn">
+            <i class="fas fa-history"></i>
+            <span>History</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="page-body">
+
+        <!-- ══════════════════════════════════
+             WHAT IS INSTANT TRANSFERS — Hero banner
+        ══════════════════════════════════ -->
+        <div class="hiw-banner">
+          <div class="hiw-banner-inner">
+            <div class="hiw-bolt"><i class="fas fa-bolt"></i></div>
+            <div class="hiw-copy">
+              <h2>What is Instant Transfers?</h2>
+              <p class="hiw-lead">
+                Instant Transfers lets you send money directly to anyone — a friend, a family member, or a business —
+                in <strong>seconds</strong>, not days. There are no hidden fees, no waiting for clearing windows,
+                and no paperwork. Just enter who you're sending to, the amount, and hit send.
+                Your money arrives in real time, 24 hours a day, 7 days a week, including weekends and holidays.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             HOW IT WORKS — 4 steps
+        ══════════════════════════════════ -->
+        <div class="hiw-steps">
+
+          <div class="hiw-step">
+            <div class="hiw-step-num">1</div>
+            <div class="hiw-step-icon"><i class="fas fa-user-check"></i></div>
+            <h4>Choose a Recipient</h4>
+            <p>Pick from your saved contacts or enter a new bank account number, email address, or mobile number. We verify the recipient before any money moves.</p>
+          </div>
+
+          <div class="hiw-step">
+            <div class="hiw-step-num">2</div>
+            <div class="hiw-step-icon"><i class="fas fa-dollar-sign"></i></div>
+            <h4>Enter the Amount</h4>
+            <p>Type in any amount using the keypad or tap a quick preset. You can also add a note — like "Rent" or "Dinner" — so both sides know what it's for.</p>
+          </div>
+
+          <div class="hiw-step">
+            <div class="hiw-step-num">3</div>
+            <div class="hiw-step-icon"><i class="fas fa-shield-alt"></i></div>
+            <h4>Review &amp; Confirm</h4>
+            <p>Double-check all the details on the review screen — recipient, amount, and account. Our fraud detection runs automatically in the background to keep you safe.</p>
+          </div>
+
+          <div class="hiw-step">
+            <div class="hiw-step-num">4</div>
+            <div class="hiw-step-icon"><i class="fas fa-paper-plane"></i></div>
+            <h4>Money Arrives Instantly</h4>
+            <p>Once confirmed, the funds leave your account and land in the recipient's account within seconds. You both get a real-time notification when it's done.</p>
+          </div>
+
+        </div>
+
+        <!-- Feature pills -->
+        <div class="feature-pills">
+          <div class="pill"><i class="fas fa-bolt"></i> Arrives in seconds</div>
+          <div class="pill highlight"><i class="fas fa-globe"></i> 190+ countries</div>
+          <div class="pill"><i class="fas fa-lock"></i> 256-bit encryption</div>
+          <div class="pill highlight"><i class="fas fa-clock"></i> 24/7 including holidays</div>
+          <div class="pill"><i class="fas fa-tag"></i> Always free</div>
+          <div class="pill"><i class="fas fa-bell"></i> Real-time notifications</div>
+          <div class="pill"><i class="fas fa-undo"></i> Cancel if still pending</div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             TRANSFER STEPPER
+        ══════════════════════════════════ -->
+        <div class="transfer-stepper">
+          <div class="step active" id="stepIndicator1">
+            <div class="step-number">1</div>
+            <div class="step-label">Recipient</div>
+          </div>
+          <div class="step" id="stepIndicator2">
+            <div class="step-number">2</div>
+            <div class="step-label">Amount</div>
+          </div>
+          <div class="step" id="stepIndicator3">
+            <div class="step-number">3</div>
+            <div class="step-label">Review</div>
+          </div>
+          <div class="step" id="stepIndicator4">
+            <div class="step-number">4</div>
+            <div class="step-label">Done</div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             TRANSFER FORM
+        ══════════════════════════════════ -->
+        <div class="transfer-form-container">
+
+          <!-- ── STEP 1: RECIPIENT ────────────── -->
+          <div class="transfer-step active" id="step1">
+            <div class="step-header">
+              <h2>Recipient Information</h2>
+              <p>Send money to a registered NexusBank member</p>
+            </div>
+
+            <section class="transfer-recipient-panel" aria-labelledby="recipientPanelTitle">
+              <div class="transfer-panel-head">
+                <h3 id="recipientPanelTitle">Recipient Information</h3>
+                <span class="recipient-status" id="recipientStatus" data-state="idle" hidden>
+                  <i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>
+                  <span class="recipient-status-text">Checking account…</span>
+                </span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="recipientEmail">Recipient Email <span class="required">*</span></label>
+                <div class="input-with-icon">
+                  <i class="fas fa-envelope" aria-hidden="true"></i>
+                  <input type="email" class="form-control" id="recipientEmail" placeholder="name@email.com" autocomplete="off" required />
+                </div>
+                <p class="field-hint">Search registered NexusBank users · Auto-detect existing accounts</p>
+                <ul class="recipient-suggestions" id="recipientSuggestions" hidden></ul>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="recipientName">Recipient Name</label>
+                <div class="input-with-icon">
+                  <i class="fas fa-user" aria-hidden="true"></i>
+                  <input type="text" class="form-control" id="recipientName" placeholder="Auto-filled when account is found" readonly />
+                </div>
+                <p class="field-hint">Filled automatically from the recipient&apos;s NexusBank profile</p>
+              </div>
+            </section>
+
+            <div class="step-actions">
+              <button class="btn-primary" id="nextStep1" type="button">
+                Continue <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- ── STEP 2: AMOUNT ───────────────── -->
+          <div class="transfer-step" id="step2">
+            <div class="step-header">
+              <h2>Enter Amount</h2>
+              <p>How much would you like to send?</p>
+            </div>
+
+            <div class="amount-section">
+              <div class="form-group">
+                <label class="form-label" for="fromAccount">From Account</label>
+                <select class="form-select" id="fromAccount">
+                  <option value="">Loading accounts…</option>
+                </select>
+                <p id="availableBalanceHint" style="font-size:0.82rem;color:var(--text-3);margin-top:8px;"></p>
+              </div>
+
+              <div class="currency-display">USD</div>
+              <div class="amount-display" id="amountDisplay">0.00</div>
+
+              <div class="amount-keypad">
+                <button class="keypad-btn" data-value="1">1</button>
+                <button class="keypad-btn" data-value="2">2</button>
+                <button class="keypad-btn" data-value="3">3</button>
+                <button class="keypad-btn" data-value="4">4</button>
+                <button class="keypad-btn" data-value="5">5</button>
+                <button class="keypad-btn" data-value="6">6</button>
+                <button class="keypad-btn" data-value="7">7</button>
+                <button class="keypad-btn" data-value="8">8</button>
+                <button class="keypad-btn" data-value="9">9</button>
+                <button class="keypad-btn" data-value=".">.</button>
+                <button class="keypad-btn" data-value="0">0</button>
+                <button class="keypad-btn" data-value="backspace"><i class="fas fa-backspace"></i></button>
+              </div>
+
+              <div class="quick-amounts">
+                <button class="quick-amount" data-amount="10">$10</button>
+                <button class="quick-amount" data-amount="50">$50</button>
+                <button class="quick-amount" data-amount="100">$100</button>
+                <button class="quick-amount" data-amount="500">$500</button>
+                <button class="quick-amount" data-amount="1000">$1,000</button>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="transferReference">Transfer Note <span class="optional">(Optional)</span></label>
+                <input type="text" class="form-control" id="transferReference" placeholder="e.g. Dinner, Rent, Gift" />
+              </div>
+
+              <div class="form-group">
+                <label class="checkbox">
+                  <input type="checkbox" id="scheduleTransfer" />
+                  <span style="font-size:.875rem; color:var(--text-2);">Schedule for later</span>
+                </label>
+                <div id="scheduleOptions" style="display:none; margin-top:14px;">
+                  <div class="schedule-options">
+                    <div class="form-group">
+                      <label class="form-label" for="scheduleDate">Schedule Date</label>
+                      <input type="date" class="form-control" id="scheduleDate" />
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label class="form-label" for="scheduleFrequency">Frequency</label>
+                      <select class="form-select" id="scheduleFrequency">
+                        <option value="once">Once</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button class="btn-secondary" id="prevStep2">
+                <i class="fas fa-arrow-left"></i> Back
+              </button>
+              <button class="btn-primary" id="nextStep2">
+                Review Transfer <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- ── STEP 3: REVIEW ──────────────── -->
+          <div class="transfer-step" id="step3">
+            <div class="step-header">
+              <h2>Review Transfer</h2>
+              <p>Double-check everything before you confirm</p>
+            </div>
+
+            <div class="review-summary">
+              <div class="summary-row">
+                <span class="summary-label">Recipient</span>
+                <span class="summary-value" id="reviewRecipient">
+                  <strong>—</strong><br><small style="color:var(--text-3);">—</small>
+                </span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">From Account</span>
+                <span class="summary-value" id="reviewAccount">Primary Checking (•••• 4589)</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Amount</span>
+                <span class="summary-value" id="reviewAmount">$0.00</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Reference</span>
+                <span class="summary-value" id="reviewReference">—</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Transfer Date</span>
+                <span class="summary-value" id="reviewDate">Today · Instant</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Fee</span>
+                <span class="summary-value" style="color:var(--success); font-weight:700;">Free</span>
+              </div>
+              <div class="summary-row summary-total">
+                <span class="summary-label">Total Deducted</span>
+                <span class="summary-value" id="reviewTotal">$0.00</span>
+              </div>
+            </div>
+
+            <div class="security-note">
+              <div class="security-icon"><i class="fas fa-shield-alt"></i></div>
+              <div class="security-info">
+                <h4>Protected Transfer</h4>
+                <p>256-bit encryption and real-time fraud detection are active on this transfer.</p>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button class="btn-secondary" id="prevStep3">
+                <i class="fas fa-arrow-left"></i> Back
+              </button>
+              <button class="btn-primary" id="nextStep3">
+                Confirm &amp; Send <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- ── STEP 4: CONFIRMATION ─────────── -->
+          <div class="transfer-step" id="step4">
+            <div class="confirmation-card">
+              <div class="confirmation-icon success">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="confirmation-content">
+                <h2>Transfer Sent!</h2>
+                <p>Your money is on its way and should arrive instantly.</p>
+
+                <div class="confirmation-details">
+                  <div class="detail">
+                    <span class="detail-label">Transaction ID</span>
+                    <span class="detail-value" id="txId">TX-000000000</span>
+                  </div>
+                  <div class="detail">
+                    <span class="detail-label">Amount</span>
+                    <span class="detail-value" id="confirmationAmount">$0.00</span>
+                  </div>
+                  <div class="detail">
+                    <span class="detail-label">Recipient</span>
+                    <span class="detail-value" id="confirmationRecipient">—</span>
+                  </div>
+                  <div class="detail">
+                    <span class="detail-label">Estimated Arrival</span>
+                    <span class="detail-value" style="color:var(--success);">Instantly</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="confirmation-actions">
+                <button class="btn-primary" id="newTransferBtn">
+                  <i class="fas fa-plus"></i> New Transfer
+                </button>
+                <button class="btn-secondary" id="viewReceiptBtn">
+                  <i class="fas fa-receipt"></i> View Receipt
+                </button>
+                <a href="transactions.html" class="btn-secondary">
+                  <i class="fas fa-history"></i> View History
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /transfer-form-container -->
+
+      </div><!-- /page-body -->
+    </main>
+  </div><!-- /app-container -->
+
+  <!-- ══════════════════════════════════════
+       ADD RECIPIENT MODAL
+  ══════════════════════════════════════ -->
+  <div class="modal" id="addRecipientModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Add New Recipient</h2>
+        <button class="modal-close" id="closeRecipientModal"><i class="fas fa-times"></i></button>
+      </div>
+
+      <form id="recipientForm">
+        <div class="form-group">
+          <label class="form-label" for="recipientType">Recipient Type</label>
+          <select class="form-select" id="recipientType">
+            <option value="personal">Personal</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="recipientFullName">Full Name *</label>
+          <input type="text" class="form-control" id="recipientFullName" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="recipientEmail">Email Address</label>
+          <input type="email" class="form-control" id="recipientEmail" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="recipientAccount">Bank Account / IBAN</label>
+          <input type="text" class="form-control" id="recipientAccount" placeholder="Account number or IBAN" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="recipientBank">Bank Name</label>
+          <input type="text" class="form-control" id="recipientBank" />
+        </div>
+        <div class="form-group">
+          <label class="checkbox">
+            <input type="checkbox" id="saveRecipient" />
+            <span style="font-size:.875rem; color:var(--text-2);">Save to quick recipients</span>
+          </label>
+        </div>
+        <button type="submit" class="btn-primary btn-block">
+          Add Recipient <i class="fas fa-check"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/money-management.js"></script>
+  <script src="js/banking.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', async function () {
+    const session = await NexusAuth.requireAuthWithProfile();
+    if (!session) return;
+    const user = session.user;
+    const profile = session.profile;
+
+    await NexusBanking.ensureBanking();
+    let accounts = await NexusBanking.fetchAccounts();
+    let selectedRecipient = { id: null, name: '', email: '' };
+    let recipientVerified = 'idle'; // idle | checking | found | not_found | self | error
+
+    const recipientStatusEl = document.getElementById('recipientStatus');
+    const recipientStatusText = recipientStatusEl?.querySelector('.recipient-status-text');
+    const recipientStatusIcon = recipientStatusEl?.querySelector('i');
+
+    function setRecipientStatus(state, message) {
+      recipientVerified = state;
+      if (!recipientStatusEl) return;
+      recipientStatusEl.dataset.state = state;
+      recipientStatusEl.hidden = state === 'idle';
+      if (recipientStatusText) recipientStatusText.textContent = message || '';
+      if (recipientStatusIcon) {
+        recipientStatusIcon.className =
+          state === 'checking'
+            ? 'fas fa-circle-notch fa-spin'
+            : state === 'found'
+              ? 'fas fa-check-circle'
+              : state === 'not_found' || state === 'self' || state === 'error'
+                ? 'fas fa-exclamation-circle'
+                : 'fas fa-info-circle';
+      }
+    }
+
+    /* ── SIDEBAR / MOBILE ─────────────────────── */
+    const mobileMenuBtn  = document.getElementById('mobileMenuBtn');
+    const sidebar        = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    if (mobileMenuBtn) {
+      mobileMenuBtn.addEventListener('click', () => {
+        sidebar.classList.add('active');
+        sidebarOverlay.classList.add('active');
+      });
+    }
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+      });
+    }
+
+    const signOutBtn = document.querySelector('.sidebar-footer a[href="index.html"]');
+    if (signOutBtn) {
+      signOutBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await NexusAuth.supabase.auth.signOut();
+        localStorage.removeItem('nexusbank_current_user');
+        sessionStorage.removeItem('nexusbank_current_user');
+        window.location.href = 'sign-in.html';
+      });
+    }
+
+    /* ── LOAD ACCOUNTS ────────────────────────── */
+    const fromAccount = document.getElementById('fromAccount');
+    const balanceHint = document.getElementById('availableBalanceHint');
+
+    function populateAccounts(acctList) {
+      accounts = acctList;
+      if (!fromAccount) return;
+      fromAccount.innerHTML = acctList
+        .map((a) => {
+          const label = `${a.account_name} (**** ${a.account_number_last4}) — ${NexusMoney.formatCurrency(a.balance)}`;
+          return `<option value="${a.id}" data-balance="${a.balance}">${label}</option>`;
+        })
+        .join('');
+      updateBalanceHint();
+    }
+
+    function updateBalanceHint() {
+      if (!fromAccount || !balanceHint) return;
+      const opt = fromAccount.options[fromAccount.selectedIndex];
+      const bal = opt?.dataset?.balance;
+      balanceHint.textContent = bal != null
+        ? `Available: ${NexusMoney.formatCurrency(bal)}`
+        : '';
+    }
+
+    populateAccounts(accounts);
+    fromAccount?.addEventListener('change', updateBalanceHint);
+
+    NexusMoney.subscribeMoneyUpdates(user.id, async () => {
+      populateAccounts(await NexusBanking.fetchAccounts());
+    });
+
+    /* ── RECIPIENT SEARCH ─────────────────────── */
+    const recipientEmail = document.getElementById('recipientEmail');
+    const recipientName = document.getElementById('recipientName');
+    const suggestions = document.getElementById('recipientSuggestions');
+    let searchTimer = null;
+    let lookupTimer = null;
+
+    function applyRecipientMatch(match) {
+      if (!match) {
+        selectedRecipient = { id: null, name: '', email: recipientEmail?.value.trim().toLowerCase() || '' };
+        if (recipientName) recipientName.value = '';
+        setRecipientStatus('not_found', 'No NexusBank account found for this email');
+        return;
+      }
+
+      if (match.id === user.id) {
+        selectedRecipient = { id: null, name: '', email: match.email };
+        if (recipientName) recipientName.value = '';
+        setRecipientStatus('self', 'You cannot send money to your own account');
+        return;
+      }
+
+      selectedRecipient = {
+        id: match.id,
+        name: match.full_name || 'NexusBank User',
+        email: match.email,
+      };
+      if (recipientName) recipientName.value = selectedRecipient.name;
+      setRecipientStatus('found', `Account found · ${selectedRecipient.name}`);
+      NexusMoney.showToast(`Recipient verified: ${selectedRecipient.name}`, 'success');
+    }
+
+    async function verifyRecipientEmail() {
+      const email = recipientEmail?.value.trim().toLowerCase();
+      if (!email || !email.includes('@')) {
+        setRecipientStatus('idle', '');
+        selectedRecipient = { id: null, name: '', email: '' };
+        if (recipientName) recipientName.value = '';
+        return;
+      }
+
+      setRecipientStatus('checking', 'Checking account…');
+      try {
+        const match = await NexusMoney.lookupRegisteredUserByEmail(email);
+        applyRecipientMatch(match);
+      } catch (err) {
+        setRecipientStatus('error', err.message || 'Could not verify recipient');
+      }
+    }
+
+    recipientEmail?.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      clearTimeout(lookupTimer);
+      const q = recipientEmail.value.trim();
+      selectedRecipient = { id: null, name: '', email: q };
+      if (recipientName) recipientName.value = '';
+      setRecipientStatus('idle', '');
+
+      if (q.length < 2) {
+        if (suggestions) {
+          suggestions.hidden = true;
+          suggestions.innerHTML = '';
+        }
+        return;
+      }
+
+      searchTimer = setTimeout(async () => {
+        try {
+          const users = await NexusMoney.searchRegisteredUsers(q);
+          if (!suggestions) return;
+          if (!users.length) {
+            suggestions.hidden = true;
+            suggestions.innerHTML = '';
+            return;
+          }
+          suggestions.innerHTML = users
+            .map(
+              (u) =>
+                `<li role="option" data-id="${u.id}" data-email="${escapeAttr(u.email)}" data-name="${escapeAttr(u.full_name || '')}">${escapeHtml(u.full_name || 'User')} &lt;${escapeHtml(u.email)}&gt;</li>`
+            )
+            .join('');
+          suggestions.hidden = false;
+          suggestions.querySelectorAll('li').forEach((li) => {
+            li.addEventListener('click', () => {
+              recipientEmail.value = li.dataset.email;
+              selectedRecipient = {
+                id: li.dataset.id,
+                name: li.dataset.name || 'NexusBank User',
+                email: li.dataset.email,
+              };
+              if (recipientName) recipientName.value = selectedRecipient.name;
+              setRecipientStatus('found', `Account found · ${selectedRecipient.name}`);
+              suggestions.hidden = true;
+            });
+          });
+        } catch (err) {
+          console.warn('User search:', err.message);
+        }
+      }, 280);
+
+      if (q.includes('@') && q.indexOf('@') < q.length - 1) {
+        lookupTimer = setTimeout(verifyRecipientEmail, 500);
+      }
+    });
+
+    recipientEmail?.addEventListener('blur', verifyRecipientEmail);
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+    function escapeAttr(str) {
+      return escapeHtml(str).replace(/"/g, '&quot;');
+    }
+
+    /* ── STEPPER STATE ────────────────────────── */
+    let currentStep = 1;
+    let transferAmount = '0';
+
+    const stepEls  = document.querySelectorAll('.transfer-step');
+    const stepInds = document.querySelectorAll('.step');
+
+    function goToStep(n) {
+      stepEls.forEach(s => s.classList.remove('active'));
+      stepInds.forEach((ind, i) => {
+        const num = ind.querySelector('.step-number');
+        if (i + 1 < n) {
+          ind.classList.add('completed'); ind.classList.remove('active');
+          num.innerHTML = '<i class="fas fa-check"></i>';
+        } else if (i + 1 === n) {
+          ind.classList.add('active'); ind.classList.remove('completed');
+          num.textContent = i + 1;
+        } else {
+          ind.classList.remove('active', 'completed');
+          num.textContent = i + 1;
+        }
+      });
+      document.getElementById('step' + n).classList.add('active');
+      currentStep = n;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ── STEP 1 NEXT ──────────────────────────── */
+    document.getElementById('nextStep1')?.addEventListener('click', async () => {
+      const email = recipientEmail?.value.trim().toLowerCase();
+      if (!email || !email.includes('@')) {
+        NexusMoney.showToast('Enter a valid recipient email address.', 'error');
+        return;
+      }
+
+      if (recipientVerified !== 'found' || !selectedRecipient.id) {
+        await verifyRecipientEmail();
+      }
+
+      if (recipientVerified === 'self') {
+        NexusMoney.showToast('You cannot transfer money to yourself.', 'error');
+        return;
+      }
+      if (recipientVerified !== 'found' || !selectedRecipient.id) {
+        NexusMoney.showToast('No registered NexusBank account found for this email.', 'error');
+        return;
+      }
+
+      goToStep(2);
+    });
+
+    /* ── KEYPAD ───────────────────────────────── */
+    const amountDisplay = document.getElementById('amountDisplay');
+
+    document.querySelectorAll('.keypad-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const v = btn.dataset.value;
+        if (v === 'backspace') {
+          transferAmount = transferAmount.length > 1 ? transferAmount.slice(0, -1) : '0';
+        } else if (v === '.') {
+          if (!transferAmount.includes('.')) transferAmount += '.';
+        } else {
+          if (transferAmount.includes('.') && transferAmount.split('.')[1].length >= 2) return;
+          transferAmount = transferAmount === '0' ? v : transferAmount + v;
+        }
+        amountDisplay.textContent = transferAmount.includes('.') ? transferAmount : parseFloat(transferAmount).toLocaleString('en-US', { minimumFractionDigits: 0 });
+        document.querySelectorAll('.quick-amount').forEach(q => q.classList.remove('active'));
+      });
+    });
+
+    document.querySelectorAll('.quick-amount').forEach(btn => {
+      btn.addEventListener('click', () => {
+        transferAmount = btn.dataset.amount;
+        amountDisplay.textContent = parseFloat(transferAmount).toLocaleString('en-US');
+        document.querySelectorAll('.quick-amount').forEach(q => q.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    document.getElementById('scheduleTransfer')?.addEventListener('change', function () {
+      const scheduleOptions = document.getElementById('scheduleOptions');
+      if (scheduleOptions) scheduleOptions.style.display = this.checked ? 'block' : 'none';
+    });
+
+    document.getElementById('prevStep2')?.addEventListener('click', () => goToStep(1));
+
+    document.getElementById('nextStep2')?.addEventListener('click', () => {
+      const amt = parseFloat(transferAmount);
+      if (!amt || amt <= 0) {
+        NexusMoney.showToast('Please enter a valid amount.', 'error');
+        return;
+      }
+
+      const accountId = fromAccount?.value;
+      const opt = fromAccount?.options[fromAccount.selectedIndex];
+      const available = parseFloat(opt?.dataset?.balance || '0');
+      if (!accountId) {
+        NexusMoney.showToast('Select an account.', 'error');
+        return;
+      }
+      if (amt > available) {
+        NexusMoney.showToast(`Insufficient funds. Available: ${NexusMoney.formatCurrency(available)}`, 'error');
+        return;
+      }
+
+      if (document.getElementById('scheduleTransfer')?.checked) {
+        NexusMoney.showToast('Scheduled transfers are not available yet. Uncheck schedule to send now.', 'error');
+        return;
+      }
+
+      const formatted = NexusMoney.formatCurrency(amt);
+      document.getElementById('reviewRecipient').innerHTML =
+        `<strong>${selectedRecipient.name}</strong><br><small style="color:var(--text-3);">${selectedRecipient.email}</small>`;
+      document.getElementById('reviewAccount').textContent = opt.text.split('—')[0].trim();
+      document.getElementById('reviewAmount').textContent = formatted;
+      document.getElementById('reviewTotal').textContent = formatted;
+
+      const ref = document.getElementById('transferReference')?.value.trim();
+      document.getElementById('reviewReference').textContent = ref || '—';
+      document.getElementById('reviewDate').textContent = 'Today · Instant';
+
+      goToStep(3);
+    });
+
+    document.getElementById('prevStep3')?.addEventListener('click', () => goToStep(2));
+
+    document.getElementById('nextStep3')?.addEventListener('click', async () => {
+      const btn = document.getElementById('nextStep3');
+      const amt = parseFloat(transferAmount);
+      const accountId = fromAccount?.value;
+      const note = document.getElementById('transferReference')?.value.trim();
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing…';
+
+      try {
+        const result = await NexusMoney.transferToUser(accountId, selectedRecipient.email, amt, note);
+
+        document.getElementById('confirmationAmount').textContent = NexusMoney.formatCurrency(amt);
+        document.getElementById('confirmationRecipient').textContent = result.recipient_name || selectedRecipient.name;
+        document.getElementById('txId').textContent = (result.transaction_id || '').slice(0, 8).toUpperCase();
+
+        NexusMoney.showToast(result.message || 'Transfer sent successfully!', 'success');
+        populateAccounts(await NexusBanking.fetchAccounts());
+        goToStep(4);
+      } catch (err) {
+        NexusMoney.showToast(err.message || 'Transfer failed', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Confirm &amp; Send <i class="fas fa-paper-plane"></i>';
+      }
+    });
+
+    document.getElementById('newTransferBtn')?.addEventListener('click', () => {
+      transferAmount = '0';
+      if (amountDisplay) amountDisplay.textContent = '0.00';
+      document.getElementById('transferReference').value = '';
+      document.getElementById('scheduleTransfer').checked = false;
+      document.getElementById('scheduleOptions').style.display = 'none';
+      recipientEmail.value = '';
+      if (recipientName) recipientName.value = '';
+      selectedRecipient = { id: null, name: '', email: '' };
+      setRecipientStatus('idle', '');
+      document.querySelectorAll('.quick-amount').forEach(q => q.classList.remove('active'));
+      goToStep(1);
+    });
+
+    document.getElementById('viewReceiptBtn')?.addEventListener('click', () => {
+      NexusMoney.showToast('Receipt saved in your transaction history.', 'success');
+      window.location.href = 'transactions.html';
+    });
+
+    document.getElementById('viewScheduleBtn')?.addEventListener('click', () => {
+      NexusMoney.showToast('Scheduled transfers coming soon.', 'error');
+    });
+    document.getElementById('viewHistoryBtn')?.addEventListener('click', () => {
+      window.location.href = 'transactions.html';
+    });
+  });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | NexusBank</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+       :root {
+    --primary: #818cf8;
+    --primary-dark: #6366f1;
+    --secondary: #a78bfa;
+    --accent: #22d3ee;
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --surface: #1e293b;
+    --surface-elevated: #334155;
+    --surface-hover: #475569;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --border-light: #334155;
+    --border-medium: #475569;
+    --success: #10b981;
+    --error: #ef4444;
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.3);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background: #111827;
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 5rem;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Live animated dark background - 30s */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background: linear-gradient(
+        135deg,
+        #111827 0%,
+        #1e1b4b 20%,
+        #1e293b 40%,
+        #312e81 60%,
+        #1e1b4b 80%,
+        #111827 100%
+    );
+    background-size: 400% 400%;
+    animation: liveDarkBackground 30s ease infinite;
+}
+
+/* Pulsing dark glow behind card - 16s */
+body::after {
+    content: '';
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 500px;
+    z-index: -1;
+    background: radial-gradient(ellipse, rgba(129, 140, 248, 0.15) 0%, transparent 70%);
+    animation: darkPulse 16s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes liveDarkBackground {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes darkPulse {
+    0%, 100% { 
+        opacity: 0.4;
+        transform: translateX(-50%) scale(1);
+    }
+    50% { 
+        opacity: 0.75;
+        transform: translateX(-50%) scale(1.2);
+    }
+}
+
+.site-logo {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    z-index: 100;
+}
+
+.site-logo a {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+.site-logo .accent {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.signin-container {
+    width: 100%;
+    max-width: 580px;
+    padding: 0 1rem;
+}
+
+/* Card reacts to background - 30s */
+.signin-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: var(--radius-xl);
+    padding: 3.5rem 4rem;
+    box-shadow: 
+        var(--shadow-xl),
+        0 0 60px rgba(129, 140, 248, 0.06);
+    animation: cardShift 30s ease infinite;
+}
+
+@keyframes cardShift {
+    0% { 
+        background: #1e293b;
+        border-color: #334155;
+        box-shadow: 
+            var(--shadow-xl),
+            0 0 50px rgba(129, 140, 248, 0.04);
+    }
+    25% { 
+        background: #1e1b4b;
+        border-color: #4338ca;
+        box-shadow: 
+            var(--shadow-xl),
+            0 0 60px rgba(167, 139, 250, 0.08);
+    }
+    50% { 
+        background: #1e293b;
+        border-color: #6366f1;
+        box-shadow: 
+            var(--shadow-xl),
+            0 0 70px rgba(129, 140, 248, 0.12);
+    }
+    75% { 
+        background: #1a1035;
+        border-color: #4f46e5;
+        box-shadow: 
+            var(--shadow-xl),
+            0 0 60px rgba(167, 139, 250, 0.08);
+    }
+    100% { 
+        background: #1e293b;
+        border-color: #334155;
+        box-shadow: 
+            var(--shadow-xl),
+            0 0 50px rgba(129, 140, 248, 0.04);
+    }
+}
+
+.back-home {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+    margin-bottom: 2.5rem;
+}
+
+.back-home:hover {
+    color: var(--primary);
+}
+
+.back-home i {
+    font-size: 0.85rem;
+}
+
+.signin-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.signin-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.signin-header p {
+    color: var(--text-tertiary);
+    font-size: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper i {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+    font-size: 1.1rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 1rem 1.25rem 1rem 3rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: all var(--transition-fast);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+}
+
+.form-input::placeholder {
+    color: var(--text-tertiary);
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+    accent-color: var(--primary);
+    width: 18px;
+    height: 18px;
+}
+
+.forgot-password {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.forgot-password:hover {
+    color: var(--secondary);
+}
+
+.btn-signin {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-bounce);
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 1.5rem;
+}
+
+.btn-signin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px -5px rgba(129, 140, 248, 0.3);
+}
+
+.btn-signin:active {
+    transform: translateY(0);
+    box-shadow: 0 5px 10px -3px rgba(129, 140, 248, 0.2);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    color: var(--text-tertiary);
+    font-size: 0.85rem;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-light);
+}
+
+.google-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.9rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-bottom: 1.5rem;
+}
+
+.google-btn:hover {
+    border-color: var(--primary);
+    background: var(--surface-hover);
+    transform: translateY(-1px);
+}
+
+.google-btn i {
+    font-size: 1.2rem;
+}
+
+.register-link {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.register-link a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+.security-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 0.75rem;
+    background: rgba(129, 140, 248, 0.1);
+    border: 1px solid rgba(129, 140, 248, 0.2);
+    border-radius: var(--radius-md);
+    color: var(--primary);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.security-badge i {
+    font-size: 0.9rem;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding-top: 4.5rem;
+    }
+
+    .site-logo {
+        top: 1rem;
+        left: 1rem;
+        background: rgba(15, 23, 42, 0.9);
+        padding: 0.5rem;
+        border-radius: var(--radius-md);
+        width: calc(100% - 2rem);
+    }
+
+    .site-logo a {
+        font-size: 1.3rem;
+    }
+
+    .signin-card {
+        padding: 2rem 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .form-options {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+
+    .signin-header h1 {
+        font-size: 1.5rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Site Logo - Fixed to top left corner of screen -->
+    <div class="site-logo">
+        <a href="index.html">
+            Nexus<span class="accent">Bank</span>
+        </a>
+    </div>
+
+    <div class="signin-container">
+        <div class="signin-card">
+            <!-- Back to Home - Top left of sign in card -->
+            <a href="index.html" class="back-home">
+                <i class="fas fa-arrow-left"></i>
+                Back to Home
+            </a>
+
+            <!-- Header -->
+            <div class="signin-header">
+                <h1><span class="gradient-text">Welcome</span> back</h1>
+                <p>Sign in to your account</p>
+            </div>
+
+            <!-- Sign In Form -->
+            <form id="signinForm" novalidate>
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            class="form-input" 
+                            placeholder="you@example.com" 
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            class="form-input" 
+                            placeholder="Enter your password" 
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe" checked>
+                        <span>Remember me</span>
+                    </label>
+                    <a href="forgot-password.html" class="forgot-password">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-signin">Sign In</button>
+            </form>
+
+            <!-- Divider -->
+            <div class="divider">or continue with</div>
+
+            <!-- Google Button Only -->
+            <button class="google-btn">
+                <i class="fab fa-google"></i>
+                Continue with Google
+            </button>
+
+            <!-- Register Link -->
+            <p class="register-link">
+                Don't have an account? <a href="register.html?tab=register">Create a new account</a>
+            </p>
+
+            <!-- Security Badge -->
+            <div class="security-badge">
+                <i class="fas fa-shield-halved"></i>
+                <span>Protected by bank-level encryption</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script>
+    if (!window.NexusAuth) {
+      alert('Could not load js/supabase-client.js. Make sure you open the site from the NexusBank2026 folder with a local server (not only by double-clicking the HTML file).');
+    }
+
+    const POST_LOGIN_PAGE = window.NexusAuth.POST_LOGIN_PAGE;
+
+    if (location.protocol === 'file:') {
+      document.addEventListener('DOMContentLoaded', function () {
+        showMessage(
+          'Supabase sign-in does not work when you open the page as file://. In VS Code use Live Server, or run: npx serve . in the NexusBank2026 folder, then open http://localhost:3000/sign-in.html',
+          'warning'
+        );
+      });
+    }
+
+    document.getElementById('signinForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const remember = document.getElementById('rememberMe')?.checked !== false;
+        const submitBtn = document.querySelector('.btn-signin');
+
+        if (!email || !password) {
+            showMessage('Please enter your email and password.', 'warning');
+            return;
+        }
+
+        if (location.protocol === 'file:') {
+            showMessage('Cannot sign in from file://. Use Live Server or http://localhost (see warning above).', 'error');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+
+        try {
+            const { data, error } = await NexusAuth.signInWithPassword(email, password);
+
+            if (error) {
+                throw new Error(NexusAuth.getLoginErrorMessage(error));
+            }
+
+            if (!data?.user) {
+                throw new Error('Sign in failed. No user session returned.');
+            }
+
+            await NexusAuth.ensureProfile(data.user);
+            await NexusAuth.saveLocalSession(data.user, remember);
+
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Success!';
+            submitBtn.style.background = 'linear-gradient(135deg, var(--success), #059669)';
+
+            setTimeout(() => {
+                window.location.href = POST_LOGIN_PAGE;
+            }, 600);
+        } catch (error) {
+            showMessage(error.message, 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Sign In';
+            submitBtn.style.background = '';
+        }
+    });
+
+    document.querySelector('.google-btn').addEventListener('click', async () => {
+        const googleBtn = document.querySelector('.google-btn');
+        googleBtn.disabled = true;
+        googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+
+        try {
+            const { error } = await NexusAuth.supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: new URL(POST_LOGIN_PAGE, window.location.href).href,
+                },
+            });
+            if (error) throw error;
+        } catch (error) {
+            showMessage(error.message, 'error');
+            googleBtn.disabled = false;
+            googleBtn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
+        }
+    });
+
+    document.querySelector('.forgot-password').addEventListener('click', async (e) => {
+        e.preventDefault();
+        const email = NexusAuth.normalizeEmail(document.getElementById('email').value);
+
+        if (!email) {
+            showMessage('Please enter your email address first', 'warning');
+            return;
+        }
+
+        try {
+            const { error } = await NexusAuth.supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: new URL('reset-password.html', window.location.href).href,
+            });
+            if (error) throw error;
+            showMessage('Password reset link sent to your email!', 'success');
+        } catch (error) {
+            showMessage(error.message, 'error');
+        }
+    });
+
+    async function checkSession() {
+        const { data: { session } } = await NexusAuth.supabase.auth.getSession();
+        if (session?.user) {
+            await NexusAuth.saveLocalSession(session.user, true);
+            window.location.href = POST_LOGIN_PAGE;
+        }
+    }
+
+    // Show message function
+    function showMessage(message, type = 'info') {
+        const existingMsg = document.querySelector('.auth-message');
+        if (existingMsg) existingMsg.remove();
+        
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'auth-message';
+        
+        const colors = {
+            error: 'var(--error)',
+            success: 'var(--success)',
+            warning: 'var(--warning)',
+            info: 'var(--primary)'
+        };
+        
+        msgDiv.style.cssText = `
+            background: ${colors[type]}20;
+            border: 1px solid ${colors[type]};
+            color: ${colors[type]};
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 500;
+            animation: slideDown 0.3s ease;
+        `;
+        
+        msgDiv.textContent = message;
+        
+        const form = document.getElementById('signinForm');
+        form.parentNode.insertBefore(msgDiv, form);
+        
+        setTimeout(() => {
+            if (msgDiv.parentNode) {
+                msgDiv.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => msgDiv.remove(), 300);
+            }
+        }, 5000);
+    }
+
+    // Add animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+        .btn-signin:disabled,
+        .google-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Check session on page load
+    checkSession();
+</script>
+</body>
+</html>
